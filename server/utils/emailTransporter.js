@@ -1,5 +1,12 @@
 const nodemailer = require("nodemailer");
+const dns = require("dns");
 
+// Force IPv4 resolution to prevent ENETUNREACH errors on Render
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch (e) {
+  // Ignore if unsupported in older Node versions
+}
 const createTransporter = () => {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT || 587);
