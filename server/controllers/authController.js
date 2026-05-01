@@ -67,6 +67,8 @@ exports.sendRegistrationOtp = async (req, res) => {
       message: `OTP sent to ${normalizedEmail}`,
     });
   } catch (error) {
+    console.error("Email send error:", error);
+    
     if (error.message === "SMTP email settings are missing") {
       return res.status(500).json({
         message: "Please add your real Gmail App Password in server/.env for SMTP_PASS",
