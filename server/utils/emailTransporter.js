@@ -30,8 +30,12 @@ const createTransporter = () => {
     });
   }
 
+  // Fallback explicitly to Gmail on port 587 (STARTTLS) instead of 465
+  // Port 465 often times out or gets blocked on cloud hosts like Render
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // false for 587, true for 465
     auth: {
       user,
       pass,
