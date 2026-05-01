@@ -27,6 +27,7 @@ const createTransporter = () => {
         user,
         pass,
       },
+      family: 4, // force IPv4
     });
   }
 
@@ -40,6 +41,7 @@ const createTransporter = () => {
       user,
       pass,
     },
+    family: 4, // force IPv4
   });
 };
 
