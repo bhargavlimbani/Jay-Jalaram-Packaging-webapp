@@ -16,6 +16,10 @@ function CustomerDashboard() {
   const [openChatOrderId, setOpenChatOrderId] = useState(null);
   const [placingCartOrder, setPlacingCartOrder] = useState(false);
   const [message, setMessage] = useState("");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentOrderId, setPaymentOrderId] = useState(null);
+  const [paymentOrderTotal, setPaymentOrderTotal] = useState(0);
+  const [showQrCode, setShowQrCode] = useState(false);
 
   const formatOrderDateTime = (value) => {
     if (!value) {
@@ -448,6 +452,7 @@ function CustomerDashboard() {
               <th className="border p-2">Quantity</th>
               <th className="border p-2">Total Price</th>
               <th className="border p-2">Approval Status</th>
+              <th className="border p-2">Payment Status</th>
               <th className="border p-2">Chat</th>
               <th className="border p-2">Action</th>
             </tr>
@@ -474,26 +479,39 @@ function CustomerDashboard() {
                   <td className="border p-2 align-top">{order.quantity}</td>
                   <td className="border p-2 align-top">Rs. {order.total_price}</td>
                   <td className="border p-2 align-top">{order.status}</td>
+                  <td className="border p-2 align-top font-semibold text-blue-700">{order.payment_status || "Unpaid"}</td>
                   <td className="border p-2 align-top">
                     {renderChatPanel(order.id)}
                   </td>
                   <td className="border p-2 align-top">
                     <button
-                      className="mb-2 rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700"
+                      className="mb-2 w-full rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700"
                       onClick={() => fetchOrderChat(order.id)}
                     >
                       Chat
                     </button>
-                    <br />
+                    {(order.payment_status !== "Paid" && order.status === "Completed") && (
+                      <button
+                        className="mb-2 w-full rounded bg-green-600 px-3 py-1 text-white hover:bg-green-700"
+                        onClick={() => {
+                          setPaymentOrderId(order.id);
+                          setPaymentOrderTotal(order.total_price);
+                          setShowQrCode(false);
+                          setShowPaymentModal(true);
+                        }}
+                      >
+                        Pay Now
+                      </button>
+                    )}
                     {order.status === "Pending" ? (
                       <button
-                        className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
+                        className="w-full rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
                         onClick={() => cancelOrder(order.id)}
                       >
-                        Cancel Order
+                        Cancel
                       </button>
                     ) : (
-                      "-"
+                      <></>
                     )}
                   </td>
                 </tr>
@@ -505,6 +523,82 @@ function CustomerDashboard() {
             )}
           </tbody>
         </table>
+
+        {/* Payment Modal */}
+        {showPaymentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="w-96 rounded-lg bg-white p-6 shadow-xl">
+              <h2 className="mb-4 text-xl font-bold">Choose Payment Method</h2>
+              <p className="mb-4 text-sm text-gray-600">
+                Order #{paymentOrderId} | Total (incl. 18% GST): Rs. {(paymentOrderTotal * 1.18).toFixed(2)}
+              </p>
+              
+              {!showQrCode ? (
+                <div className="flex flex-col gap-3">
+                  <button
+                    className="rounded bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"
+                    onClick={() => setShowQrCode(true)}
+                  >
+                    Pay Online (UPI QR)
+                  </button>
+                  <button
+                    className="rounded border-2 border-gray-300 bg-white px-4 py-3 font-semibold text-gray-700 hover:bg-gray-50"
+                    onClick={async () => {
+                      try {
+                        await api.post(`/orders/${paymentOrderId}/chat`, {
+                          message: "I have opted to pay Offline at the store."
+                        });
+                        setMessage("Offline payment selected. The admin has been notified. Please pay at the store.");
+                        setShowPaymentModal(false);
+                      } catch (err) {
+                        setMessage("Offline payment selected, but failed to automatically notify admin.");
+                        setShowPaymentModal(false);
+                      }
+                    }}
+                  >
+                    Pay Offline (Cash / Admin)
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-2">
+                  <p className="mb-3 text-center text-sm font-semibold text-gray-700">Scan this QR Code with any UPI App (GPay, PhonePe, Paytm)</p>
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`upi://pay?pa=limbanibhargavmaheshbhai-1@okhdfcbank&pn=Jay%20Jalaram%20Packaging&am=${(paymentOrderTotal * 1.18).toFixed(2)}&cu=INR`)}`} 
+                    alt="UPI QR Code" 
+                    className="mb-4 h-56 w-56 rounded border p-2 shadow-sm"
+                  />
+                  <button
+                    className="mt-2 w-full rounded bg-blue-600 px-4 py-2 text-white font-semibold shadow hover:bg-blue-700"
+                    onClick={async () => {
+                      try {
+                        await api.post("/payments/self-report", {
+                          order_id: paymentOrderId,
+                          amount: (paymentOrderTotal * 1.18).toFixed(2)
+                        });
+                        setMessage("Payment successful! Your order is now Paid.");
+                        setShowPaymentModal(false);
+                        fetchMyOrders();
+                      } catch(err) {
+                        setMessage("Failed to record payment.");
+                      }
+                    }}
+                  >
+                    I have completed the payment
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-4 flex justify-end">
+                <button
+                  className="text-sm text-gray-500 hover:text-gray-800"
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

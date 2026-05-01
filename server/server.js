@@ -200,6 +200,7 @@ app.use("/api/materials", materialRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Schema reloaded successfully!`);
 });
 const verifyToken = require("./middleware/authMiddleware");
 

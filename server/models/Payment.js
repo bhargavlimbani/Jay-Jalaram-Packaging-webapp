@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const Order = require("./Order");   // <-- FIXED PATH
+const Order = require("./Order");
 
 const Payment = sequelize.define("Payment", {
   amount: {
@@ -8,17 +8,21 @@ const Payment = sequelize.define("Payment", {
     allowNull: false,
   },
   method: {
-    type: DataTypes.ENUM("Cash", "UPI", "Bank Transfer"),
+    type: DataTypes.ENUM("Cash", "UPI", "Bank Transfer", "Online"),
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM("Paid", "Pending"),
+    type: DataTypes.ENUM("Paid", "Pending", "Failed"),
     defaultValue: "Paid",
   },
+  transaction_id: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  }
 });
 
 // Relationship
-Order.hasOne(Payment, { foreignKey: "order_id" });
+Order.hasMany(Payment, { foreignKey: "order_id" });
 Payment.belongsTo(Order, { foreignKey: "order_id" });
 
 module.exports = Payment;

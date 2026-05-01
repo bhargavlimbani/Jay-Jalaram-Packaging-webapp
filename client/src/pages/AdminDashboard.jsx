@@ -104,6 +104,12 @@ function AdminDashboard() {
   const [message, setMessage] = useState("");
   const [activeSection, setActiveSection] = useState("customers");
   const [loadingOrderActionId, setLoadingOrderActionId] = useState(null);
+  
+  // Payment Modal States
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentOrderId, setPaymentOrderId] = useState(null);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [brandingForm, setBrandingForm] = useState(defaultBranding);
   const [homeForm, setHomeForm] = useState({
     heroKicker: defaultHome.heroKicker,
@@ -416,6 +422,26 @@ function AdminDashboard() {
       setMessage(error.response?.data?.message || "Unable to generate invoice.");
     } finally {
       setLoadingOrderActionId(null);
+    }
+  };
+
+  const handleRecordPayment = async () => {
+    if (!paymentAmount || paymentAmount <= 0) {
+      setMessage("Please enter a valid amount.");
+      return;
+    }
+    try {
+      await api.post("/payments", {
+        order_id: paymentOrderId,
+        amount: paymentAmount,
+        method: paymentMethod
+      });
+      setMessage("Payment recorded successfully.");
+      setShowPaymentModal(false);
+      fetchOrders();
+    } catch (error) {
+      console.log(error);
+      setMessage(error.response?.data?.message || "Unable to record payment.");
     }
   };
 
@@ -861,6 +887,7 @@ function AdminDashboard() {
               <th className="border p-2">Quantity</th>
               <th className="border p-2">Total Price</th>
               <th className="border p-2">Status</th>
+              <th className="border p-2">Payment Status</th>
               <th className="border p-2">Chat</th>
               <th className="border p-2">Action</th>
             </tr>
@@ -887,6 +914,7 @@ function AdminDashboard() {
                   <td className="border p-2 align-top">{order.quantity}</td>
                   <td className="border p-2 align-top">Rs. {order.total_price}</td>
                   <td className="border p-2 align-top">{order.status}</td>
+                  <td className="border p-2 align-top font-semibold text-blue-700">{order.payment_status || "Unpaid"}</td>
                   <td className="border p-2 align-top">
                     {order.customer_reply && (
                       <p className="mb-2 text-sm text-blue-700">Customer reply: {order.customer_reply}</p>
@@ -932,6 +960,12 @@ function AdminDashboard() {
                           if (action === "accept") updateStatus(order.id, "Accepted");
                           if (action === "complete") updateStatus(order.id, "Completed");
                           if (action === "invoice") generateInvoice(order.id);
+                          if (action === "payment") {
+                            setPaymentOrderId(order.id);
+                            setPaymentAmount((order.total_price * 1.18).toFixed(2));
+                            setPaymentMethod("Cash");
+                            setShowPaymentModal(true);
+                          }
                           if (action === "reject") updateStatus(order.id, "Rejected");
                         }}
                       >
@@ -939,6 +973,7 @@ function AdminDashboard() {
                           Select Action
                         </option>
                         <option value="chat">Open Chat</option>
+                        <option value="payment" disabled={order.payment_status === "Paid"}>Record Payment</option>
                         <option
                           value="accept"
                           disabled={
@@ -1652,6 +1687,52 @@ function AdminDashboard() {
             )}
           </div>
         </div>
+
+        {/* Payment Modal for Admin */}
+        {showPaymentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="w-96 rounded-lg bg-white p-6 shadow-xl">
+              <h2 className="mb-4 text-xl font-bold">Record Payment</h2>
+              <p className="mb-2 text-sm text-gray-600">Order #{paymentOrderId}</p>
+              <div className="mb-4">
+                <label className="mb-1 block text-sm font-semibold">Amount Received (Rs.)</label>
+                <input
+                  type="number"
+                  className="w-full rounded border px-3 py-2"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="mb-1 block text-sm font-semibold">Method</label>
+                <select
+                  className="w-full rounded border px-3 py-2"
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                >
+                  <option value="Cash">Cash</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="UPI">UPI</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  className="rounded bg-gray-500 px-4 py-2 text-white"
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="rounded bg-green-600 px-4 py-2 text-white"
+                  onClick={handleRecordPayment}
+                >
+                  Record
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

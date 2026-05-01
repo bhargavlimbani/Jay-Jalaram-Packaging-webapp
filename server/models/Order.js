@@ -68,7 +68,7 @@ const Order = sequelize.define("Order", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  status: {
+    status: {
     type: DataTypes.ENUM(
         "Pending",
         "Accepted",
@@ -79,6 +79,10 @@ const Order = sequelize.define("Order", {
     ),
     defaultValue: "Pending",
 },
+  payment_status: {
+    type: DataTypes.ENUM("Unpaid", "Partially Paid", "Paid"),
+    defaultValue: "Unpaid",
+  },
 });
 
 // Relationships

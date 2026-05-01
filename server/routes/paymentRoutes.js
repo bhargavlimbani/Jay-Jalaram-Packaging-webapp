@@ -13,6 +13,13 @@ router.post(
   paymentController.recordPayment
 );
 
+// Customer self-reports payment via QR
+router.post(
+  "/self-report",
+  verifyToken,
+  paymentController.recordCustomerPayment
+);
+
 // Admin dashboard stats
 router.get(
   "/stats",
@@ -27,6 +34,20 @@ router.get(
   verifyToken,
   checkRole("admin"),
   paymentController.getMonthlyRevenue
+);
+
+// Customer creates Razorpay order
+router.post(
+  "/razorpay/create",
+  verifyToken,
+  paymentController.createRazorpayOrder
+);
+
+// Customer verifies Razorpay payment
+router.post(
+  "/razorpay/verify",
+  verifyToken,
+  paymentController.verifyRazorpayPayment
 );
 
 module.exports = router;
