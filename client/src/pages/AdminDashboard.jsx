@@ -179,7 +179,7 @@ function AdminDashboard() {
 
   const fetchProducts = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/products");
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/products`);
       const data = await res.json();
       setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -200,7 +200,7 @@ function AdminDashboard() {
 
   const fetchCustomers = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/customers", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/customers`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -312,7 +312,7 @@ function AdminDashboard() {
 
   const fetchCustomerDetails = async (customerId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/customers/${customerId}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/auth/customers/${customerId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -331,7 +331,7 @@ function AdminDashboard() {
 
   const fetchOrderChat = async (orderId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/chat`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}/chat`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -356,7 +356,7 @@ function AdminDashboard() {
         setMessage("Please write a chat message before sending.");
         return;
       }
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/chat`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/orders/${orderId}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -644,8 +644,8 @@ function AdminDashboard() {
   const saveProduct = async () => {
     try {
       const url = editingProductId
-        ? `http://localhost:5000/api/products/${editingProductId}`
-        : "http://localhost:5000/api/products";
+        ? `${process.env.REACT_APP_API_URL}/products/${editingProductId}`
+        : `${process.env.REACT_APP_API_URL}/products`;
       const method = editingProductId ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -683,7 +683,7 @@ function AdminDashboard() {
 
   const deleteProduct = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/products/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
