@@ -1,48 +1,87 @@
-const nodemailer = require("nodemailer");
-const dns = require("dns");
-
-// Force IPv4 resolution to prevent ENETUNREACH errors on Render
-try {
-  dns.setDefaultResultOrder("ipv4first");
-} catch (e) {
-  // Ignore if unsupported in older Node versions
-}
 const createTransporter = () => {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = (process.env.SMTP_USER || "").trim();
-  // Gmail app passwords are often copied with spaces; remove them safely.
-  const pass = (process.env.SMTP_PASS || "").replace(/\s+/g, "");
+  return {
+    sendMail: async (mailOptions) => {
+      const { to, subject, html, attachments, from } = mailOptions;
+      const senderEmail = from || process.env.MAIL_FROM || "jayjalarampackaging1@gmail.com";
+      const senderName = "Jai Jalaram Packaging";
 
-  if (!user || !pass || pass === "your-16-digit-gmail-app-password") {
-    throw new Error("SMTP email settings are missing");
-  }
+      // 1. Try Brevo (Sendinblue) API
+      if (process.env.BREVO_API_KEY) {
+        let brevoAttachments = undefined;
+        if (attachments && attachments.length > 0) {
+          brevoAttachments = attachments.map((att) => ({
+            name: att.filename,
+            content: Buffer.isBuffer(att.content)
+              ? att.content.toString("base64")
+              : Buffer.from(att.content).toString("base64"),
+          }));
+        }
 
-  if (host) {
-    return nodemailer.createTransport({
-      host,
-      port,
-      secure: port === 465,
-      auth: {
-        user,
-        pass,
-      },
-      family: 4, // force IPv4
-    });
-  }
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            "api-key": process.env.BREVO_API_KEY,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify({
+            sender: { name: senderName, email: senderEmail },
+            to: [{ email: to }],
+            subject: subject,
+            htmlContent: html,
+            attachment: brevoAttachments,
+          }),
+        });
 
-  // Fallback explicitly to Gmail on port 587 (STARTTLS) instead of 465
-  // Port 465 often times out or gets blocked on cloud hosts like Render
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // false for 587, true for 465
-    auth: {
-      user,
-      pass,
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error("Brevo API Error:", errText);
+          throw new Error("Email API failed");
+        }
+        return await response.json();
+      }
+
+      // 2. Try SendGrid API
+      if (process.env.SENDGRID_API_KEY) {
+        let sgAttachments = undefined;
+        if (attachments && attachments.length > 0) {
+          sgAttachments = attachments.map((att) => ({
+            filename: att.filename,
+            content: Buffer.isBuffer(att.content)
+              ? att.content.toString("base64")
+              : Buffer.from(att.content).toString("base64"),
+            type: att.contentType || "application/pdf",
+            disposition: "attachment",
+          }));
+        }
+
+        const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            personalizations: [{ to: [{ email: to }] }],
+            from: { email: senderEmail, name: senderName },
+            subject: subject,
+            content: [{ type: "text/html", value: html }],
+            attachments: sgAttachments,
+          }),
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error("SendGrid API Error:", errText);
+          throw new Error("Email API failed");
+        }
+        return true;
+      }
+
+      console.error("Missing Email API Key. Provide BREVO_API_KEY or SENDGRID_API_KEY in Render.");
+      throw new Error("Missing Email API Key");
     },
-    family: 4, // force IPv4
-  });
+  };
 };
 
 module.exports = createTransporter;
