@@ -26,8 +26,13 @@ function Register() {
     try {
       resetMessages();
 
-      if (!name.trim() || !email.trim() || !password.trim()) {
-        setErrorMessage("Name, email, and password are required");
+      if (!name.trim() || !email.trim() || !password.trim() || !phone.trim()) {
+        setErrorMessage("Name, email, phone, and password are required");
+        return;
+      }
+
+      if (phone.trim().length !== 10) {
+        setErrorMessage("Phone number must be exactly 10 digits");
         return;
       }
 
@@ -136,11 +141,13 @@ function Register() {
               placeholder="Enter phone number"
               value={phone}
               onChange={(e) => {
-                setPhone(e.target.value);
+                const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                setPhone(val);
                 resetMessages();
               }}
               disabled={otpSent}
               className="brand-input"
+              maxLength={10}
             />
           </div>
 

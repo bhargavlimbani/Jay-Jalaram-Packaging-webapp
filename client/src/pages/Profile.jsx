@@ -93,7 +93,11 @@ function Profile() {
             className="rounded border p-3"
             placeholder="Phone Number"
             value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            maxLength={10}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+              setFormData({ ...formData, phone: val });
+            }}
           />
           <textarea
             className="rounded border p-3"

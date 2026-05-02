@@ -25,8 +25,12 @@ exports.sendRegistrationOtp = async (req, res) => {
     const { name, email, phone, address, password } = req.body;
     const normalizedEmail = normalizeEmail(email);
 
-    if (!name?.trim() || !normalizedEmail || !password?.trim()) {
-      return res.status(400).json({ message: "Name, email, and password are required" });
+    if (!name?.trim() || !normalizedEmail || !password?.trim() || !phone?.trim()) {
+      return res.status(400).json({ message: "Name, email, phone, and password are required" });
+    }
+
+    if (phone.trim().length !== 10) {
+      return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
     }
 
     if (!isValidEmail(normalizedEmail)) {
@@ -237,6 +241,10 @@ exports.updateProfile = async (req, res) => {
 
     if (normalizedEmail && !isValidEmail(normalizedEmail)) {
       return res.status(400).json({ message: "Please enter a valid email address" });
+    }
+
+    if (phone && phone.trim().length !== 10) {
+      return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
     }
 
     if (normalizedEmail && normalizedEmail !== user.email) {
