@@ -1,0 +1,3 @@
+INSERT INTO pending_registrations (name,email,phone,address,password_hash,otp_hash,otp_expires_at,createdAt,updatedAt) VALUES
+	 ('brijesh','brijeshlimbani11@gmail.con','8490061116','moviya','$2b$10$2EraThAT0p6ZqMkU4Yj5Tej3MwKKaGqypUTJxJorZfmxkPBEBrBZK','2daf1808edb65f719f351eebf7063ff5f8029085d01b507594cad25d846b792b','2026-05-01 05:42:11','2026-05-01 05:32:11','2026-05-01 05:32:11'),
+	 ('Karmadipsinh Jadeja','karmadipsinhjadeja@gmail.com','6355215563','Railnagar Main Road','$2b$10$Ey/Z93Y2DSlxAWQvgi4YZOdozRfqxPrqYYu1JwfZtD8/e527XMvu6','84037913fa51bfb7b8b00b02bc818f84df972d132ae6b188d9b415448d2bc292','2026-05-01 10:37:02','2026-05-01 10:27:02','2026-05-01 10:27:02');

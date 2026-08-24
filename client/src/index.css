@@ -4,15 +4,56 @@
 
 @layer base {
   :root {
-    --brand-primary: #ffdb58;
-    --brand-primary-deep: #f4c712;
-    --brand-primary-soft: #fff4c2;
-    --brand-ink: #1f2937;
-    --brand-muted: #6b7280;
+    /* Brand core */
+    --brand-primary: #ffd43b;
+    --brand-primary-deep: #f0b429;
+    --brand-primary-dark: #c98a05;
+    --brand-primary-soft: #fff3c4;
+    --brand-ink: #14181f;
+    --brand-ink-soft: #2b323d;
+    --brand-muted: #646d7c;
     --brand-surface: #fffdf6;
     --brand-surface-strong: #fff7db;
-    --brand-line: rgba(31, 41, 55, 0.12);
-    --brand-shadow: 0 24px 60px rgba(31, 41, 55, 0.1);
+    --brand-line: rgba(20, 24, 31, 0.08);
+
+    /* Paper stock the whole app sits on */
+    --paper-hi: #fdfaf3;
+    --paper: #f7f2e7;
+    --paper-lo: #efe8d9;
+    --kraft: #c8894a;
+
+    /* 3D light model - a single light source at top-left */
+    --light-top: rgba(255, 255, 255, 0.9);
+    --light-rim: rgba(255, 255, 255, 0.55);
+    --shade-1: rgba(20, 24, 31, 0.04);
+    --shade-2: rgba(20, 24, 31, 0.07);
+    --shade-3: rgba(20, 24, 31, 0.11);
+
+    /* Layered elevation ramp (contact + mid + ambient shadows) */
+    --elev-1:
+      0 1px 1px var(--shade-1),
+      0 2px 4px var(--shade-1),
+      0 6px 12px var(--shade-1);
+    --elev-2:
+      0 1px 2px var(--shade-2),
+      0 4px 10px var(--shade-1),
+      0 14px 28px var(--shade-2);
+    --elev-3:
+      0 2px 4px var(--shade-2),
+      0 8px 20px var(--shade-2),
+      0 24px 48px var(--shade-2),
+      0 40px 80px var(--shade-1);
+    --elev-4:
+      0 2px 6px var(--shade-3),
+      0 12px 28px var(--shade-2),
+      0 32px 64px var(--shade-3),
+      0 60px 120px var(--shade-2);
+
+    --glow-amber: 0 10px 30px -6px rgba(240, 180, 41, 0.5);
+    --brand-shadow: var(--elev-3);
+
+    --ease-out-3d: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   html {
@@ -22,64 +63,536 @@
   body {
     margin: 0;
     color: var(--brand-ink);
-    background:
-      radial-gradient(circle at top right, rgba(255, 219, 88, 0.32), transparent 24%),
-      linear-gradient(180deg, #fffdf7 0%, #fff9ea 100%);
+    /* Warm kraft-paper worktop: the surface a carton would sit on */
+    background-color: var(--paper);
     font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /*
+   * Ground layer: paper stock + a single warm key light from the top-left.
+   * One light source only - competing coloured pools read as decoration,
+   * not as a lit surface. Static: no animation on a full-viewport layer.
+   */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -4;
+    pointer-events: none;
+    background:
+      radial-gradient(58rem 42rem at 6% -12%, rgba(255, 205, 74, 0.3), transparent 62%),
+      radial-gradient(50rem 40rem at 104% 108%, rgba(198, 148, 88, 0.16), transparent 64%),
+      linear-gradient(178deg, var(--paper-hi) 0%, var(--paper) 52%, var(--paper-lo) 100%);
+  }
+
+  /*
+   * Dieline layer: the fine cutting grid from a die-cut box template, with
+   * heavier rules every 6th line for the fold marks. Masked to a soft pool so
+   * it reads as texture near the top and fades out down the page.
+   */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(122, 92, 46, 0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(122, 92, 46, 0.16) 1px, transparent 1px),
+      linear-gradient(rgba(122, 92, 46, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(122, 92, 46, 0.07) 1px, transparent 1px);
+    background-size: 264px 264px, 264px 264px, 44px 44px, 44px 44px;
+    -webkit-mask-image: radial-gradient(58% 46% at 50% 8%, #000 0%, transparent 100%);
+    mask-image: radial-gradient(58% 46% at 50% 8%, #000 0%, transparent 100%);
   }
 
   * {
     box-sizing: border-box;
   }
+
+  ::selection {
+    background: var(--brand-primary);
+    color: var(--brand-ink);
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(20, 24, 31, 0.04);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--brand-primary), var(--brand-primary-deep));
+    background-clip: content-box;
+  }
 }
 
 @layer components {
   .brand-page {
-    @apply min-h-screen;
+    @apply relative min-h-screen;
   }
 
   .brand-container {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
+  /* ---------- Surfaces ---------- */
+
+  /*
+   * A sheet of white stock resting on the kraft worktop. Opaque rather than
+   * frosted: backdrop-filter on every panel forces the whole subtree to
+   * re-composite on scroll, which is the single biggest cost in this design.
+   */
   .brand-panel {
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid var(--brand-line);
-    box-shadow: var(--brand-shadow);
-    @apply rounded-[28px] backdrop-blur-sm;
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(180deg, #ffffff 0%, #fefcf8 100%);
+    border: 1px solid rgba(122, 92, 46, 0.1);
+    box-shadow:
+      inset 0 1px 0 var(--light-top),
+      inset 0 -1px 0 rgba(20, 24, 31, 0.05),
+      var(--elev-3);
+    @apply rounded-[28px];
   }
 
+  /* Specular sheen across the top face */
+  .brand-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0) 42%,
+      rgba(255, 255, 255, 0) 58%,
+      rgba(255, 212, 59, 0.12) 100%
+    );
+  }
+
+  .brand-panel-flat {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(122, 92, 46, 0.1);
+    box-shadow: inset 0 1px 0 var(--light-top), var(--elev-1);
+    @apply rounded-[24px];
+  }
+
+  /* Raised inner tile - reads as a block sitting on the panel */
+  .brand-tile {
+    position: relative;
+    background: linear-gradient(160deg, #ffffff 0%, #fdf8ec 100%);
+    border: 1px solid rgba(122, 92, 46, 0.11);
+    box-shadow:
+      inset 0 1px 0 var(--light-top),
+      inset 0 -2px 0 rgba(20, 24, 31, 0.04),
+      var(--elev-1);
+    transition: transform 0.4s var(--ease-out-3d), box-shadow 0.4s var(--ease-out-3d);
+    @apply rounded-[24px];
+  }
+
+  .brand-tile:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      inset 0 1px 0 var(--light-top),
+      var(--elev-2);
+  }
+
+  .brand-tile-amber {
+    background: linear-gradient(160deg, #fff6cf 0%, #ffe89a 100%);
+    border-color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ---------- 3D motion ---------- */
+
+  .brand-scene {
+    perspective: 1400px;
+    perspective-origin: 50% 40%;
+  }
+
+  /* Card that tips away from the cursor and lifts off the page */
+  .brand-card-hover {
+    transform-style: preserve-3d;
+    transition:
+      transform 0.55s var(--ease-out-3d),
+      box-shadow 0.55s var(--ease-out-3d);
+    box-shadow: var(--elev-2);
+  }
+
+  .brand-card-hover:hover {
+    transform: translateY(-10px) rotateX(4deg) rotateY(-4deg) scale(1.015);
+    box-shadow: var(--elev-4);
+    will-change: transform;
+  }
+
+  /* Deeper variant for hero / feature cards */
+  .brand-tilt {
+    transform-style: preserve-3d;
+    transition: transform 0.6s var(--ease-out-3d), box-shadow 0.6s var(--ease-out-3d);
+  }
+
+  .brand-tilt:hover {
+    transform: translateY(-14px) rotateX(7deg) rotateY(-8deg) scale(1.02);
+    box-shadow: var(--elev-4);
+    will-change: transform;
+  }
+
+  /* Children pushed forward in Z so they separate from the card face */
+  .brand-layer-1 { transform: translateZ(28px); }
+  .brand-layer-2 { transform: translateZ(52px); }
+  .brand-layer-3 { transform: translateZ(80px); }
+
+  .brand-float {
+    animation: brand-float 7s var(--ease-out-3d) infinite;
+  }
+
+  .brand-float-slow {
+    animation: brand-float 11s var(--ease-out-3d) infinite;
+  }
+
+  .brand-float-delay {
+    animation: brand-float 8.5s var(--ease-out-3d) infinite;
+    animation-delay: -3s;
+  }
+
+  /* ---------- Buttons: extruded, with a real press ---------- */
+
   .brand-button {
-    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition duration-200;
-    background: var(--brand-primary);
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(180deg, #ffe071 0%, var(--brand-primary) 45%, var(--brand-primary-deep) 100%);
     color: var(--brand-ink);
-    box-shadow: 0 12px 24px rgba(255, 219, 88, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      inset 0 -2px 0 rgba(160, 108, 0, 0.35),
+      0 4px 0 -1px var(--brand-primary-dark),
+      var(--glow-amber);
+    transition:
+      transform 0.25s var(--ease-spring),
+      box-shadow 0.25s var(--ease-out-3d),
+      filter 0.25s ease;
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold;
+  }
+
+  .brand-button::after {
+    content: "";
+    position: absolute;
+    inset: 1px 1px 50% 1px;
+    z-index: -1;
+    border-radius: 999px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
   }
 
   .brand-button:hover {
-    background: var(--brand-primary-deep);
-    transform: translateY(-1px);
+    transform: translateY(-3px);
+    filter: saturate(1.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -2px 0 rgba(160, 108, 0, 0.35),
+      0 7px 0 -1px var(--brand-primary-dark),
+      0 18px 34px -8px rgba(240, 180, 41, 0.6);
+  }
+
+  .brand-button:active {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 2px 6px rgba(160, 108, 0, 0.4),
+      0 1px 0 -1px var(--brand-primary-dark);
   }
 
   .brand-button-dark {
-    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition duration-200;
-    background: var(--brand-ink);
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(180deg, #333a47 0%, var(--brand-ink) 60%, #0a0d12 100%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.5),
+      0 4px 0 -1px #05070a,
+      0 12px 28px -8px rgba(20, 24, 31, 0.6);
+    transition:
+      transform 0.25s var(--ease-spring),
+      box-shadow 0.25s var(--ease-out-3d);
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold;
+  }
+
+  .brand-button-dark::after {
+    content: "";
+    position: absolute;
+    inset: 1px 1px 50% 1px;
+    z-index: -1;
+    border-radius: 999px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
   }
 
   .brand-button-dark:hover {
-    background: #111827;
-    transform: translateY(-1px);
+    transform: translateY(-3px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.26),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.5),
+      0 7px 0 -1px #05070a,
+      0 20px 36px -10px rgba(20, 24, 31, 0.65);
   }
 
+  .brand-button-dark:active {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.6),
+      0 1px 0 -1px #05070a;
+  }
+
+  .brand-button-ghost {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--brand-ink);
+    border: 1px solid rgba(20, 24, 31, 0.1);
+    box-shadow: inset 0 1px 0 var(--light-top), var(--elev-1);
+    transition: transform 0.25s var(--ease-spring), box-shadow 0.25s var(--ease-out-3d), background 0.25s ease;
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold;
+  }
+
+  .brand-button-ghost:hover {
+    background: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: inset 0 1px 0 var(--light-top), var(--elev-2);
+  }
+
+  /* ---------- Semantic extruded buttons (dashboards) ---------- */
+
+  .brand-btn-3d {
+    position: relative;
+    isolation: isolate;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    transition:
+      transform 0.22s var(--ease-spring),
+      box-shadow 0.22s var(--ease-out-3d),
+      filter 0.22s ease;
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold;
+  }
+
+  .brand-btn-3d::after {
+    content: "";
+    position: absolute;
+    inset: 1px 1px 50% 1px;
+    z-index: -1;
+    border-radius: 999px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+  }
+
+  .brand-btn-3d:hover:not(:disabled) {
+    transform: translateY(-3px);
+    filter: saturate(1.06);
+  }
+
+  .brand-btn-3d:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .brand-btn-3d:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .brand-btn-blue {
+    background: linear-gradient(180deg, #5b9bff 0%, #2563eb 55%, #1d4ed8 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 4px 0 -1px #1a3fa8,
+      0 12px 26px -10px rgba(37, 99, 235, 0.7);
+  }
+
+  .brand-btn-blue:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 7px 0 -1px #1a3fa8,
+      0 18px 32px -10px rgba(37, 99, 235, 0.75);
+  }
+
+  .brand-btn-green {
+    background: linear-gradient(180deg, #46d17f 0%, #16a34a 55%, #12833d 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 4px 0 -1px #0d6a31,
+      0 12px 26px -10px rgba(22, 163, 74, 0.7);
+  }
+
+  .brand-btn-green:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 7px 0 -1px #0d6a31,
+      0 18px 32px -10px rgba(22, 163, 74, 0.75);
+  }
+
+  .brand-btn-red {
+    background: linear-gradient(180deg, #f87171 0%, #dc2626 55%, #b91c1c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 4px 0 -1px #911616,
+      0 12px 26px -10px rgba(220, 38, 38, 0.65);
+  }
+
+  .brand-btn-red:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 7px 0 -1px #911616,
+      0 18px 32px -10px rgba(220, 38, 38, 0.7);
+  }
+
+  .brand-btn-gray {
+    background: linear-gradient(180deg, #8b93a1 0%, #64748b 55%, #4d5a6d 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 4px 0 -1px #3c4757,
+      0 12px 26px -10px rgba(100, 116, 139, 0.6);
+  }
+
+  .brand-btn-gray:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 7px 0 -1px #3c4757,
+      0 18px 32px -10px rgba(100, 116, 139, 0.65);
+  }
+
+  /* ---------- KPI stat tiles (admin) ---------- */
+
+  .brand-stat-3d {
+    position: relative;
+    overflow: hidden;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+      var(--elev-2);
+    transition: transform 0.4s var(--ease-out-3d), box-shadow 0.4s var(--ease-out-3d);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    @apply rounded-[22px] p-4;
+  }
+
+  .brand-stat-3d::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 55% 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
+  }
+
+  .brand-stat-3d:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      var(--elev-4);
+  }
+
+  /* ---------- Notes / status blocks ---------- */
+
+  .brand-note {
+    border: 1px solid rgba(20, 24, 31, 0.08);
+    box-shadow: inset 0 1px 0 var(--light-top), var(--elev-1);
+    @apply rounded-2xl px-4 py-3.5;
+  }
+
+  .brand-note-blue {
+    background: linear-gradient(160deg, #eaf2ff 0%, #d8e7ff 100%);
+    border-color: rgba(37, 99, 235, 0.18);
+    color: #16346f;
+  }
+
+  .brand-note-amber {
+    background: linear-gradient(160deg, #fff6cf 0%, #ffe89a 100%);
+    border-color: rgba(201, 138, 5, 0.22);
+    color: #6b4a00;
+  }
+
+  /* ---------- Data tables with depth ---------- */
+
+  .brand-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 1px 0 var(--light-top), var(--elev-2);
+    @apply w-full rounded-[20px];
+  }
+
+  .brand-table thead tr {
+    background: linear-gradient(180deg, #fff3c4 0%, #ffe89a 100%);
+  }
+
+  .brand-table th {
+    border-bottom: 1px solid rgba(20, 24, 31, 0.1);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    @apply px-3 py-3 text-left text-xs font-black uppercase tracking-wider;
+  }
+
+  .brand-table td {
+    border-bottom: 1px solid rgba(20, 24, 31, 0.06);
+    @apply px-3 py-3 align-top text-sm;
+  }
+
+  .brand-table tbody tr {
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .brand-table tbody tr:hover {
+    background: rgba(255, 244, 205, 0.5);
+    box-shadow: inset 3px 0 0 var(--brand-primary);
+  }
+
+  .brand-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ---------- Form controls: inset, like a pressed slot ---------- */
+
   .brand-input {
-    border: 1px solid rgba(31, 41, 55, 0.14);
-    background: rgba(255, 255, 255, 0.95);
-    @apply w-full rounded-2xl px-4 py-3 outline-none transition;
+    border: 1px solid rgba(20, 24, 31, 0.1);
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(255, 255, 255, 0.95));
+    color: var(--brand-ink);
+    box-shadow:
+      inset 0 2px 4px rgba(20, 24, 31, 0.06),
+      0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s var(--ease-out-3d);
+    @apply w-full rounded-2xl px-4 py-3 outline-none;
+  }
+
+  .brand-input::placeholder {
+    color: rgba(107, 114, 128, 0.7);
+  }
+
+  .brand-input:hover {
+    border-color: rgba(20, 24, 31, 0.18);
   }
 
   .brand-input:focus {
     border-color: var(--brand-primary-deep);
-    box-shadow: 0 0 0 4px rgba(255, 219, 88, 0.22);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 2px 4px rgba(20, 24, 31, 0.05),
+      0 0 0 4px rgba(255, 212, 59, 0.28),
+      0 8px 20px -8px rgba(240, 180, 41, 0.55);
   }
 
   .brand-label {
@@ -87,13 +600,20 @@
     color: var(--brand-muted);
   }
 
+  /* ---------- Type ---------- */
+
   .brand-kicker {
-    @apply text-xs font-semibold uppercase tracking-[0.3em];
-    color: #8b6b00;
+    @apply inline-flex items-center text-xs font-semibold uppercase tracking-[0.3em];
+    color: #8a6200;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
   }
 
   .brand-title {
-    @apply text-4xl font-black leading-tight md:text-5xl lg:text-6xl;
+    @apply text-4xl font-black leading-[1.05] tracking-tight md:text-5xl lg:text-6xl;
+    background: linear-gradient(165deg, #1c222c 0%, #14181f 45%, #4a3c07 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .brand-subtitle {
@@ -101,19 +621,313 @@
     color: var(--brand-muted);
   }
 
+  /* ---------- Auth shell ---------- */
+
   .brand-auth-shell {
+    position: relative;
+    perspective: 1600px;
     background:
-      radial-gradient(circle at top left, rgba(255, 219, 88, 0.45), transparent 25%),
-      linear-gradient(135deg, #fffdf6 0%, #fff5d1 48%, #f5f7fb 100%);
+      radial-gradient(40rem 32rem at 8% -10%, rgba(255, 205, 74, 0.4), transparent 62%),
+      radial-gradient(36rem 30rem at 102% 104%, rgba(198, 148, 88, 0.22), transparent 64%),
+      linear-gradient(160deg, var(--paper-hi) 0%, var(--paper) 55%, var(--paper-lo) 100%);
     @apply min-h-screen px-4 py-10;
   }
 
-  .brand-card-hover {
-    @apply transition duration-300 hover:-translate-y-1;
-    box-shadow: 0 18px 36px rgba(31, 41, 55, 0.08);
+  /* Same dieline template grid as the app ground */
+  .brand-auth-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(122, 92, 46, 0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(122, 92, 46, 0.16) 1px, transparent 1px),
+      linear-gradient(rgba(122, 92, 46, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(122, 92, 46, 0.07) 1px, transparent 1px);
+    background-size: 264px 264px, 264px 264px, 44px 44px, 44px 44px;
+    -webkit-mask-image: radial-gradient(72% 62% at 50% 42%, #000 0%, transparent 100%);
+    mask-image: radial-gradient(72% 62% at 50% 42%, #000 0%, transparent 100%);
   }
 
-  .brand-card-hover:hover {
-    box-shadow: 0 28px 48px rgba(31, 41, 55, 0.14);
+  /* ---------- Bits ---------- */
+
+  .brand-chip {
+    background: linear-gradient(180deg, #ffffff, #f6f7fa);
+    border: 1px solid rgba(20, 24, 31, 0.08);
+    box-shadow: inset 0 1px 0 var(--light-top), var(--elev-1);
+    transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease, background 0.25s ease;
+    @apply inline-flex items-center rounded-full px-4 py-2.5 text-sm font-semibold;
+  }
+
+  .brand-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 0 var(--light-top), var(--elev-2);
+  }
+
+  .brand-chip-active {
+    background: linear-gradient(180deg, #ffe071, var(--brand-primary-deep));
+    border-color: rgba(255, 255, 255, 0.6);
+    color: var(--brand-ink);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -2px 0 rgba(160, 108, 0, 0.3),
+      var(--glow-amber);
+  }
+
+  .brand-image-3d {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 18px 34px -14px rgba(20, 24, 31, 0.4);
+    transition: transform 0.55s var(--ease-out-3d), box-shadow 0.55s var(--ease-out-3d);
+  }
+
+  .brand-image-3d:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 28px 52px -16px rgba(20, 24, 31, 0.45);
+  }
+
+  /* Contact-shadow ellipse under a floating object */
+  .brand-ground-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: -18px;
+    width: 62%;
+    height: 26px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(20, 24, 31, 0.3), transparent 78%);
+    filter: blur(7px);
+    animation: brand-shadow-pulse 7s var(--ease-out-3d) infinite;
+    pointer-events: none;
+  }
+
+  .brand-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(20, 24, 31, 0.14), transparent);
+  }
+
+  /* Entrance: rise out of the page */
+  .brand-reveal {
+    animation: brand-reveal 0.85s var(--ease-out-3d) both;
+  }
+
+  .brand-reveal-1 { animation-delay: 0.06s; }
+  .brand-reveal-2 { animation-delay: 0.14s; }
+  .brand-reveal-3 { animation-delay: 0.22s; }
+  .brand-reveal-4 { animation-delay: 0.3s; }
+  .brand-reveal-5 { animation-delay: 0.38s; }
+
+  /* ---------- Ambient carton field (BoxField component) ---------- */
+
+  .boxfield {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+  }
+
+  .boxfield-item {
+    position: absolute;
+    animation-name: brand-drift;
+    animation-timing-function: var(--ease-out-3d);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  /* The field is decoration: below md it would only crowd a narrow layout */
+  @media (max-width: 767px) {
+    .boxfield {
+      display: none;
+    }
+  }
+
+  /* ---------- Pointer-tracked tilt (Tilt3D component) ---------- */
+
+  .tilt3d {
+    --rx: 0deg;
+    --ry: 0deg;
+    --px: 50%;
+    --py: 50%;
+    --lift: 0px;
+    --scale: 1;
+    --glare: 0;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry))
+      translateY(var(--lift)) scale(var(--scale));
+    transition: transform 0.4s var(--ease-out-3d), box-shadow 0.4s var(--ease-out-3d);
+  }
+
+  .tilt3d:hover {
+    box-shadow: var(--elev-4);
+    will-change: transform;
+  }
+
+  .tilt3d-glare {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: var(--glare);
+    transition: opacity 0.35s ease;
+    background: radial-gradient(
+      22rem 22rem at var(--px) var(--py),
+      rgba(255, 255, 255, 0.5),
+      rgba(255, 255, 255, 0) 60%
+    );
+  }
+
+  /* ---------- Scroll reveal (Reveal component) ---------- */
+
+  .reveal3d {
+    opacity: 0;
+    transform: perspective(1100px) translate3d(0, 34px, -70px) rotateX(7deg);
+    transition:
+      opacity 0.8s var(--ease-out-3d),
+      transform 0.9s var(--ease-out-3d);
+    will-change: transform, opacity;
+  }
+
+  .reveal3d-in {
+    opacity: 1;
+    transform: perspective(1100px) translate3d(0, 0, 0) rotateX(0deg);
+  }
+
+  /* ---------- Rotating 3D box (hero centrepiece) ---------- */
+
+  .brand-cube-stage {
+    perspective: 1100px;
+    perspective-origin: 50% 45%;
+  }
+
+  .brand-cube {
+    position: relative;
+    transform-style: preserve-3d;
+    animation: brand-cube-spin 22s linear infinite;
+  }
+
+  .brand-cube-stage:hover .brand-cube {
+    animation-play-state: paused;
+  }
+
+  .brand-cube-static {
+    animation: none;
+  }
+
+  .brand-cube-face {
+    position: absolute;
+    inset: 0;
+    /* Faces re-shape smoothly when the carton's dimensions change */
+    transition:
+      width 0.5s var(--ease-out-3d),
+      height 0.5s var(--ease-out-3d),
+      left 0.5s var(--ease-out-3d),
+      top 0.5s var(--ease-out-3d),
+      transform 0.5s var(--ease-out-3d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 14px;
+    background: linear-gradient(150deg, #e6b877 0%, #c8894a 55%, #a86a33 100%);
+    box-shadow: inset 0 0 40px rgba(90, 50, 15, 0.35);
+  }
+
+  /* Corrugated flute texture on the box faces */
+  .brand-cube-face::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(120, 70, 25, 0.32) 0px,
+      rgba(120, 70, 25, 0.32) 1px,
+      transparent 1px,
+      transparent 9px
+    );
+    pointer-events: none;
+  }
+
+  .brand-cube-face::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%);
+    pointer-events: none;
+  }
+
+  .brand-cube-face-top {
+    background: linear-gradient(150deg, #f2cd94 0%, #dda469 100%);
+  }
+
+  .brand-cube-face-bottom {
+    background: linear-gradient(150deg, #9c6230 0%, #7c4a22 100%);
+  }
+}
+
+@layer utilities {
+  .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; }
+  .text-balance { text-wrap: balance; }
+}
+
+@keyframes brand-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -16px, 0) rotate(-1.2deg); }
+}
+
+@keyframes brand-shadow-pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.55; }
+  50% { transform: translateX(-50%) scale(0.86); opacity: 0.3; }
+}
+
+@keyframes brand-reveal {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) translate3d(0, 28px, -60px) rotateX(8deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1000px) translate3d(0, 0, 0) rotateX(0deg);
+  }
+}
+
+@keyframes brand-drift {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  100% { transform: translate3d(0, -26px, 0) rotate(2.5deg); }
+}
+
+@keyframes brand-cube-spin {
+  from { transform: rotateX(-18deg) rotateY(0deg); }
+  to { transform: rotateX(-18deg) rotateY(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .brand-card-hover:hover,
+  .brand-tilt:hover {
+    transform: translateY(-4px);
+  }
+
+  .tilt3d {
+    transform: none !important;
+  }
+
+  .reveal3d {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import ErrorBoundary from "./components/ErrorBoundary";
+import BoxField from "./components/BoxField";
+
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Login from "./pages/Login";
@@ -16,7 +19,10 @@ import Invoices from "./pages/Invoices";
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
+      <BoxField />
+
+      <ErrorBoundary>
+        <Routes>
 
         {/* Homepage */}
         <Route path="/" element={<Home />} />
@@ -71,7 +77,8 @@ function App() {
           }
         />
 
-      </Routes>
+        </Routes>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

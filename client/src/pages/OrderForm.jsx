@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import BoxCube3D from "../components/BoxCube3D";
+import Tilt3D from "../components/Tilt3D";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
@@ -47,6 +49,8 @@ function OrderForm() {
   }, [length, width, height, quantity]);
   const selectedCountry =
     COUNTRY_OPTIONS.find((country) => country.code === selectedCountryCode) || COUNTRY_OPTIONS[0];
+  const hasDimensions =
+    (parseFloat(length) || 0) > 0 && (parseFloat(width) || 0) > 0 && (parseFloat(height) || 0) > 0;
 
   const handlePhoneChange = (event) => {
     const nextValue = event.target.value.replace(/\D/g, "");
@@ -171,31 +175,52 @@ function OrderForm() {
 
       <section className="brand-container py-8 lg:py-12">
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="brand-panel p-8 md:p-10">
+          <div className="brand-panel brand-reveal brand-scene p-8 md:p-10 lg:sticky lg:top-28 lg:self-start">
             <p className="brand-kicker">Custom Manufacturing</p>
-            <h1 className="mt-3 text-4xl font-black">Build your box specification.</h1>
+            <h1 className="brand-title mt-3 !text-4xl">Build your box specification.</h1>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               Share box size, quantity, design notes, and PDF artwork. We will review the request and confirm production through your order dashboard.
             </p>
 
+            {/* Live 3D preview - reshapes as the dimensions are typed */}
+            <div className="relative mt-10 flex min-h-[290px] items-center justify-center">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 rounded-[32px] bg-[radial-gradient(60%_55%_at_50%_45%,rgba(255,212,59,0.34),transparent_70%)] blur-2xl"
+              />
+              <BoxCube3D
+                size={200}
+                w={parseFloat(length) || 1}
+                h={parseFloat(height) || 1}
+                d={parseFloat(width) || 1}
+                className="relative z-10"
+              />
+            </div>
+
+            <p className="mt-8 text-center text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+              {hasDimensions
+                ? `${length || 0}″ L × ${width || 0}″ W × ${height || 0}″ H`
+                : "Enter dimensions to shape the preview"}
+            </p>
+
             <div className="mt-8 space-y-4">
-              <div className="rounded-[24px] bg-[var(--brand-surface-strong)] p-5">
+              <Tilt3D max={10} lift={6} className="brand-tile brand-tile-amber p-5">
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-amber-800">
                   Estimated Price
                 </p>
-                <p className="mt-2 text-4xl font-black">Rs. {price}</p>
-              </div>
-              <div className="rounded-[24px] bg-white p-5 text-sm leading-7 text-slate-600">
+                <p className="mt-2 text-4xl font-black tracking-tight">Rs. {price}</p>
+              </Tilt3D>
+              <div className="brand-tile p-5 text-sm leading-7 text-slate-600">
                 Upload PDF or ZIP only. Maximum file size: 5 MB. Include print design, dieline, or special branding instructions if available.
               </div>
             </div>
           </div>
 
-          <div className="brand-panel p-8 md:p-10">
-            <h2 className="text-3xl font-black">Custom Box Order</h2>
+          <div className="brand-panel brand-reveal brand-reveal-2 p-8 md:p-10">
+            <h2 className="text-3xl font-black tracking-tight">Custom Box Order</h2>
 
             {message && (
-              <div className="mt-5 rounded-2xl bg-red-100 px-4 py-3 text-sm text-red-700">
+              <div className="brand-note mt-5 border-red-200/70 bg-gradient-to-b from-red-50 to-red-100 text-sm font-medium text-red-700">
                 {message}
               </div>
             )}
@@ -313,7 +338,7 @@ function OrderForm() {
             </div>
 
             {designFileName && (
-              <p className="mt-4 text-sm font-semibold text-green-700">
+              <p className="brand-note brand-note-amber mt-4 !bg-gradient-to-b !from-green-50 !to-green-100 text-sm font-semibold !text-green-800">
                 Selected File: {designFileName}
               </p>
             )}

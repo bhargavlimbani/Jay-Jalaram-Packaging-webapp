@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser, sendRegistrationOtp } from "../services/authService";
+import AuthScene from "../components/AuthScene";
 
 function Register() {
   const [name, setName] = useState("");
@@ -95,10 +96,10 @@ function Register() {
   };
 
   return (
-    <div className="brand-auth-shell flex items-center justify-center">
-      <div className="brand-panel w-full max-w-3xl p-8 md:p-12">
+    <AuthScene>
+      <div className="brand-panel brand-reveal w-full max-w-3xl p-8 md:p-12">
         <p className="brand-kicker">New Customer</p>
-        <h2 className="mt-3 text-4xl font-black text-gray-900">Create Account</h2>
+        <h2 className="brand-title mt-3 !text-4xl">Create Account</h2>
         <p className="mt-3 text-sm text-gray-600">
           Register to place orders, track history, and manage your profile.
         </p>
@@ -249,7 +250,7 @@ function Register() {
           </Link>
         </p>
       </div>
-    </div>
+    </AuthScene>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { forgotPasswordRequest, resetPasswordWithOtpRequest } from "../services/authService";
+import AuthScene from "../components/AuthScene";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -78,10 +79,10 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="brand-auth-shell flex items-center justify-center">
-      <div className="brand-panel w-full max-w-lg p-8 md:p-10">
+    <AuthScene>
+      <div className="brand-panel brand-reveal w-full max-w-lg p-8 md:p-10">
         <p className="brand-kicker">Account Recovery</p>
-        <h2 className="mt-3 text-4xl font-black text-gray-900">Forgot Password</h2>
+        <h2 className="brand-title mt-3 !text-4xl">Forgot Password</h2>
         <p className="mt-3 text-sm text-gray-600">
           Enter your registered email and we will send a password reset link and OTP.
         </p>
@@ -192,7 +193,7 @@ function ForgotPassword() {
           </Link>
         </p>
       </div>
-    </div>
+    </AuthScene>
   );
 }
 

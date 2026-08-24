@@ -3,6 +3,8 @@ import { loginUser } from "../services/authService";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import AuthScene from "../components/AuthScene";
+import BoxCube3D from "../components/BoxCube3D";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -41,11 +43,11 @@ function Login() {
   };
 
   return (
-    <div className="brand-auth-shell flex items-center justify-center">
-      <div className="brand-panel w-full max-w-5xl overflow-hidden">
+    <AuthScene>
+      <div className="brand-panel brand-reveal w-full max-w-5xl overflow-hidden">
         <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="bg-[var(--brand-ink)] p-8 text-white md:p-12">
-            <div className="inline-flex rounded-[28px] bg-white/10 p-3">
+          <div className="relative overflow-hidden bg-gradient-to-br from-[#252c38] via-[var(--brand-ink)] to-[#05070a] p-8 text-white shadow-[inset_-1px_0_0_rgba(255,255,255,0.08)] md:p-12">
+            <div className="relative inline-flex rounded-[28px] border border-white/15 bg-white/10 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_18px_36px_-16px_rgba(0,0,0,0.8)] backdrop-blur">
               <img src={logo} alt="Jai Jalaram Packaging" className="h-16 w-auto object-contain" />
             </div>
             <p className="mt-6 brand-kicker text-amber-300">Customer Access</p>
@@ -55,10 +57,14 @@ function Login() {
             <p className="mt-4 text-sm leading-7 text-slate-300">
               Sign in to place multi-product orders, request custom box production, and stay in touch with admin updates.
             </p>
+
+            <div className="mt-10 hidden justify-center lg:flex">
+              <BoxCube3D size={168} w={3.2} h={2.8} d={3} branded={false} />
+            </div>
           </div>
 
           <div className="p-8 md:p-12">
-            <h2 className="text-3xl font-black">Login</h2>
+            <h2 className="brand-title !text-3xl">Login</h2>
             <p className="mt-2 text-sm text-slate-600">Use your registered email to continue.</p>
 
             <div className="mt-8 space-y-4">
@@ -78,7 +84,7 @@ function Login() {
 
               <div>
                 <label className="brand-label">Password</label>
-                <div className="flex overflow-hidden rounded-2xl border border-black/10 bg-white">
+                <div className="brand-input flex overflow-hidden !p-0">
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter Password"
@@ -92,7 +98,7 @@ function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="bg-amber-50 px-4 font-semibold text-slate-700"
+                    className="bg-gradient-to-b from-amber-100 to-amber-200 px-4 font-semibold text-slate-800 transition hover:from-amber-200 hover:to-amber-300"
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -101,7 +107,7 @@ function Login() {
             </div>
 
             {errorMessage && (
-              <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+              <p className="mt-4 rounded-2xl border border-red-200/70 bg-red-50 px-4 py-3 text-sm font-medium text-red-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_8px_20px_-12px_rgba(220,38,38,0.5)]">
                 {errorMessage}
               </p>
             )}
@@ -125,7 +131,7 @@ function Login() {
           </div>
         </div>
       </div>
-    </div>
+    </AuthScene>
   );
 }
 

@@ -7,20 +7,20 @@ export const defaultBranding = {
 };
 
 export const defaultHome = {
-  heroKicker: "Ocean-Inspired Storefront",
-  heroTitle: "Premium Corrugated Packaging With A Bold, Modern Frontend.",
+  heroKicker: "Corrugated Box Manufacturer",
+  heroTitle: "Corrugated Packaging Built To Survive The Journey.",
   heroSubtitle:
-    "Explore industrial boxes, shipping cartons, printed packaging, and custom-made orders in a storefront styled around your yellow brand identity.",
+    "Shipping cartons, printed corrugated boxes, duplex packaging, and made-to-size production from our Rajkot works. Order stock sizes or send us your dimensions.",
   primaryCtaLabel: "Explore Products",
   secondaryCtaLabel: "Request Custom Box",
   stats: [
-    { value: "4+", label: "Packaging categories" },
-    { value: "Fast", label: "Admin-approved order workflow" },
-    { value: "Custom", label: "Size and design-based manufacturing" },
+    { value: "4+", label: "Box categories in stock" },
+    { value: "Fast", label: "Quote confirmed before production" },
+    { value: "Custom", label: "Made to your exact dimensions" },
   ],
   featureTitle: "Shipping Ready Boxes",
   featureDescription:
-    "Durable packaging with a cleaner storefront presentation and stronger order journey.",
+    "Tested board strength for transport and stacking, in the sizes most dispatch teams reorder every month.",
   collectionItems: [
     {
       title: "Small Corrugated Box",
@@ -35,12 +35,12 @@ export const defaultHome = {
       text: "Heavy-duty board strength for demanding industrial handling.",
     },
   ],
-  benefitsTitle: "Designed for repeat ordering and custom manufacturing.",
+  benefitsTitle: "Built for reorders and made-to-size production.",
   benefitsPoints: [
-    "Browse packaging by category",
-    "Add multiple products before placing one order",
-    "Upload custom box design PDF files",
-    "Track admin responses from your dashboard",
+    "Browse boxes by type and size",
+    "Combine several products into one order",
+    "Send print artwork or a dieline as PDF",
+    "Track approval, payment, and invoices",
   ],
   footerKicker: "Contact Us",
   footerTitle: "Let's build better packaging together.",

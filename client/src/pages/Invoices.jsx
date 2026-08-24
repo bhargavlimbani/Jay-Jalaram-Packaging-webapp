@@ -74,17 +74,17 @@ function Invoices() {
       <Navbar />
 
       <section className="brand-container py-8">
-        <div className="brand-panel px-6 py-8 md:px-10">
+        <div className="brand-panel brand-reveal px-6 py-8 md:px-10">
           <p className="brand-kicker">
             {user?.role === "admin" ? "Admin Invoice Center" : "Customer Invoice Center"}
           </p>
-          <h1 className="mt-3 text-4xl font-black md:text-5xl">Invoices</h1>
+          <h1 className="brand-title mt-3">Invoices</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
             View invoice details and download invoice PDFs generated automatically when orders are accepted.
           </p>
 
           {message && (
-            <div className="mt-5 rounded-2xl bg-blue-100 px-4 py-3 text-sm text-blue-900">
+            <div className="brand-note brand-note-blue mt-5 text-sm">
               {message}
             </div>
           )}
@@ -92,10 +92,10 @@ function Invoices() {
       </section>
 
       <section className="brand-container pb-12">
-        <div className="brand-panel overflow-hidden">
+        <div className="brand-panel brand-reveal brand-reveal-2 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[960px]">
-              <thead className="bg-[var(--brand-primary-soft)] text-left">
+            <table className="brand-table min-w-[960px]">
+              <thead className="text-left">
                 <tr>
                   <th className="px-5 py-4 text-sm font-semibold">Invoice No</th>
                   <th className="px-5 py-4 text-sm font-semibold">Order ID</th>
@@ -110,7 +110,7 @@ function Invoices() {
               <tbody>
                 {!loading && invoices.length > 0 ? (
                   invoices.map((invoice) => (
-                    <tr key={invoice.id} className="border-t border-black/10">
+                    <tr key={invoice.id}>
                       <td className="px-5 py-4 text-sm font-semibold">{invoice.invoice_number}</td>
                       <td className="px-5 py-4 text-sm">{invoice.order_id}</td>
                       <td className="px-5 py-4 text-sm">
@@ -128,7 +128,7 @@ function Invoices() {
                       <td className="px-5 py-4 text-sm">
                         <div className="flex flex-wrap gap-2">
                           <button
-                            className="rounded-full bg-[var(--brand-ink)] px-4 py-2 text-xs font-semibold text-white"
+                            className="brand-button-dark px-4 py-2 text-xs"
                             onClick={() =>
                               openInvoicePdf(invoice.id, `${invoice.invoice_number}.pdf`, false)
                             }
@@ -136,7 +136,7 @@ function Invoices() {
                             View PDF
                           </button>
                           <button
-                            className="rounded-full bg-[var(--brand-primary)] px-4 py-2 text-xs font-semibold text-[var(--brand-ink)]"
+                            className="brand-button px-4 py-2 text-xs"
                             onClick={() =>
                               openInvoicePdf(invoice.id, `${invoice.invoice_number}.pdf`, true)
                             }
@@ -145,7 +145,7 @@ function Invoices() {
                           </button>
                           {user?.role === "admin" && (
                             <button
-                              className="rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+                              className="brand-btn-3d brand-btn-blue px-4 py-2 text-xs"
                               onClick={() => shareInvoiceToCustomer(invoice.id)}
                               disabled={
                                 loadingInvoiceId === invoice.id ||

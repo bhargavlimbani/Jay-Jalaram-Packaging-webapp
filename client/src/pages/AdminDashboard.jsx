@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Tilt3D from "../components/Tilt3D";
 import { AuthContext } from "../context/AuthContext";
 import { Bar } from "react-chartjs-2";
 import api from "../services/api";
@@ -843,8 +844,8 @@ function AdminDashboard() {
 
   const renderChatPanel = (orderId) =>
     openChatOrderId === orderId ? (
-      <div className="mt-3 rounded border bg-slate-50 p-3">
-        <div className="max-h-48 overflow-y-auto rounded border bg-white p-3">
+      <div className="brand-note mt-3 bg-slate-50/80 p-3">
+        <div className="brand-input max-h-48 overflow-y-auto !py-3">
           {(chatMessages[orderId] || []).length > 0 ? (
             chatMessages[orderId].map((chat, index) => (
               <div key={`${orderId}-${index}`} className="mb-3">
@@ -857,7 +858,7 @@ function AdminDashboard() {
           )}
         </div>
         <textarea
-          className="mt-3 w-full rounded border p-2 text-sm"
+          className="brand-input mt-3 text-sm"
           rows="2"
           placeholder="Type message to customer"
           value={chatInputs[orderId] || ""}
@@ -866,7 +867,7 @@ function AdminDashboard() {
           }
         />
         <button
-          className="mt-2 rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700"
+          className="brand-btn-3d brand-btn-blue mt-2 px-3 py-1.5"
           onClick={() => sendChatMessage(orderId)}
         >
           Send Chat
@@ -875,30 +876,30 @@ function AdminDashboard() {
     ) : null;
 
   const renderOrdersTable = (ordersToRender, title, emptyMessage, showActionButtons = true) => (
-    <div className="rounded-2xl bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-2xl font-bold">{title}</h2>
+    <div className="brand-panel p-6">
+      <h2 className="brand-title mb-4 !text-2xl">{title}</h2>
       <div className="overflow-x-auto">
-        <table className="mb-2 w-full border bg-white">
+        <table className="brand-table mb-2">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">Customer</th>
-              <th className="border p-2">Date & Time</th>
-              <th className="border p-2">Product</th>
-              <th className="border p-2">Quantity</th>
-              <th className="border p-2">Total Price</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Payment Status</th>
-              <th className="border p-2">Chat</th>
-              <th className="border p-2">Action</th>
+            <tr>
+              <th>Customer</th>
+              <th>Date & Time</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Total Price</th>
+              <th>Status</th>
+              <th>Payment Status</th>
+              <th>Chat</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {ordersToRender.length > 0 ? (
               ordersToRender.map((order) => (
                 <tr key={order.id}>
-                  <td className="border p-2 align-top">{order.User?.name || "Customer"}</td>
-                  <td className="border p-2 align-top">{formatOrderDateTime(order.createdAt)}</td>
-                  <td className="border p-2 align-top">
+                  <td>{order.User?.name || "Customer"}</td>
+                  <td>{formatOrderDateTime(order.createdAt)}</td>
+                  <td>
                     {order.order_type === "custom" ? (
                       `Custom Box (${order.box_length} x ${order.box_width} x ${order.box_height})`
                     ) : (
@@ -911,11 +912,11 @@ function AdminDashboard() {
                       </div>
                     )}
                   </td>
-                  <td className="border p-2 align-top">{order.quantity}</td>
-                  <td className="border p-2 align-top">Rs. {order.total_price}</td>
-                  <td className="border p-2 align-top">{order.status}</td>
-                  <td className="border p-2 align-top font-semibold text-blue-700">{order.payment_status || "Unpaid"}</td>
-                  <td className="border p-2 align-top">
+                  <td>{order.quantity}</td>
+                  <td>Rs. {order.total_price}</td>
+                  <td>{order.status}</td>
+                  <td className="font-semibold text-blue-700">{order.payment_status || "Unpaid"}</td>
+                  <td>
                     {order.customer_reply && (
                       <p className="mb-2 text-sm text-blue-700">Customer reply: {order.customer_reply}</p>
                     )}
@@ -941,16 +942,16 @@ function AdminDashboard() {
                     )}
                     {renderChatPanel(order.id)}
                     {order.Invoice && (
-                      <div className="mt-3 rounded bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                      <div className="brand-note brand-note-amber mt-3 !px-3 !py-2 text-xs">
                         Invoice: {order.Invoice.invoice_number}
                         {order.Invoice.is_shared_with_customer ? " (Shared)" : " (Not Shared)"}
                       </div>
                     )}
                   </td>
-                  <td className="border p-2 align-top">
+                  <td>
                     {showActionButtons ? (
                       <select
-                        className="w-full rounded border px-3 py-2 text-sm"
+                        className="brand-input text-sm"
                         defaultValue=""
                         onChange={(event) => {
                           const action = event.target.value;
@@ -1020,7 +1021,7 @@ function AdminDashboard() {
                 </tr>
               ))
             ) : (
-              <tr><td className="border p-4 text-center" colSpan="8">{emptyMessage}</td></tr>
+              <tr><td className="p-6 text-center text-slate-500" colSpan="8">{emptyMessage}</td></tr>
             )}
           </tbody>
         </table>
@@ -1031,29 +1032,64 @@ function AdminDashboard() {
   return (
     <div>
       <Navbar />
-      <div className="bg-slate-50 p-4 md:p-6 lg:p-8">
-        <div className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="mb-3 text-3xl font-bold">Admin Dashboard</h1>
-          {message && <div className="mb-6 rounded bg-blue-100 px-4 py-3 text-blue-900">{message}</div>}
-          <div className="mb-6 rounded bg-green-500 p-4 text-white">Total Sales: Rs. {totalSales}</div>
-          <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-6">
-            <div className="rounded bg-blue-500 p-4 text-white">Total Orders: {orders.length}</div>
-            <div className="rounded bg-cyan-500 p-4 text-white">Total Customers: {customers.length}</div>
-            <div className="rounded bg-yellow-500 p-4 text-white">Pending: {pending}</div>
-            <div className="rounded bg-green-500 p-4 text-white">Accepted: {accepted}</div>
-            <div className="rounded bg-red-500 p-4 text-white">Rejected: {rejected}</div>
-            <div className="rounded bg-indigo-500 p-4 text-white">
-              Material Value: Rs. {Number(totalMaterialValue.toFixed(2))}
-            </div>
+      <div className="brand-page p-4 md:p-6 lg:p-8">
+        <div className="brand-panel brand-reveal brand-scene mb-6 p-6 md:p-8">
+          <p className="brand-kicker">Control Centre</p>
+          <h1 className="brand-title mt-2 !text-4xl">Admin Dashboard</h1>
+
+          {message && <div className="brand-note brand-note-blue mt-6">{message}</div>}
+
+          <Tilt3D
+            max={6}
+            lift={8}
+            className="brand-stat-3d mt-8 bg-gradient-to-br from-[#46d17f] to-[#12833d] !p-7"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-white/80">Total Sales</p>
+            <p className="brand-layer-1 mt-2 text-4xl font-black tracking-tight md:text-5xl">
+              Rs. {totalSales}
+            </p>
+          </Tilt3D>
+
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {[
+              { label: "Total Orders", value: orders.length, tone: "from-[#5b9bff] to-[#1d4ed8]" },
+              { label: "Total Customers", value: customers.length, tone: "from-[#3ec8e0] to-[#0e7490]" },
+              { label: "Pending", value: pending, tone: "from-[#ffd43b] to-[#c98a05]" },
+              { label: "Accepted", value: accepted, tone: "from-[#46d17f] to-[#12833d]" },
+              { label: "Rejected", value: rejected, tone: "from-[#f87171] to-[#b91c1c]" },
+              {
+                label: "Material Value",
+                value: `Rs. ${Number(totalMaterialValue.toFixed(2))}`,
+                tone: "from-[#818cf8] to-[#4338ca]",
+              },
+            ].map((stat) => (
+              <Tilt3D
+                key={stat.label}
+                max={10}
+                lift={8}
+                className={`brand-stat-3d bg-gradient-to-br ${stat.tone}`}
+              >
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/80">
+                  {stat.label}
+                </p>
+                <p className="brand-layer-1 mt-1.5 text-3xl font-black tracking-tight">
+                  {stat.value}
+                </p>
+              </Tilt3D>
+            ))}
           </div>
-          <div className="w-full max-w-xl">
-            <Bar data={chartData} />
+
+          <div className="brand-tile mt-8 w-full max-w-2xl p-5">
+            <p className="brand-kicker">Orders Overview</p>
+            <div className="mt-4">
+              <Bar data={chartData} />
+            </div>
           </div>
         </div>
 
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="lg:w-72">
-            <div className="rounded-2xl bg-slate-900 p-4 text-white shadow-sm lg:sticky lg:top-6">
+            <div className="rounded-[24px] bg-gradient-to-b from-[#2b323d] to-[#0a0d12] p-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_24px_48px_-20px_rgba(0,0,0,0.7)] lg:sticky lg:top-6">
               <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">
                 Menu
               </p>
@@ -1107,13 +1143,13 @@ function AdminDashboard() {
                 </button>
                 <Link
                   to="/invoices"
-                  className="block w-full rounded-lg px-4 py-3 text-left transition bg-slate-800 hover:bg-slate-700"
+                  className="block w-full rounded-2xl px-4 py-3 text-left transition duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-white/[0.07] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] hover:translate-x-1 hover:bg-white/[0.16]"
                 >
                   Invoice Management
                 </Link>
                 <button
                   type="button"
-                  className="w-full rounded-lg bg-red-600 px-4 py-3 text-left text-white transition hover:bg-red-700"
+                  className="brand-btn-3d brand-btn-red w-full !justify-start px-4 py-3"
                   onClick={handleLogout}
                 >
                   Logout
@@ -1128,41 +1164,41 @@ function AdminDashboard() {
             )}
 
             {activeSection === "customers" && (
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-2xl font-bold">All Customers</h2>
+              <div className="brand-panel p-6">
+                <h2 className="brand-title mb-4 !text-2xl">All Customers</h2>
                 <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {customers.length > 0 ? customers.map((customer) => (
-                    <button key={customer.id} className="rounded-xl border bg-white p-5 text-left shadow-sm hover:border-blue-400" onClick={() => fetchCustomerDetails(customer.id)}>
+                    <button key={customer.id} className="brand-tile p-5 text-left hover:border-blue-300" onClick={() => fetchCustomerDetails(customer.id)}>
                       <h3 className="text-lg font-semibold">{customer.name}</h3>
                       <p className="mt-1 text-sm text-gray-700">{customer.email}</p>
                       <p className="mt-1 text-sm text-gray-700">{customer.phone || "No phone"}</p>
                     </button>
-                  )) : <div className="rounded border bg-white p-4">No customers found.</div>}
+                  )) : <div className="brand-tile p-4">No customers found.</div>}
                 </div>
                 {selectedCustomer && (
-                  <div className="rounded-xl border bg-white p-6 shadow-sm">
-                    <h3 className="text-2xl font-bold">{selectedCustomer.name}</h3>
+                  <div className="brand-tile p-6">
+                    <h3 className="text-2xl font-black tracking-tight">{selectedCustomer.name}</h3>
                     <p className="mt-2 text-sm text-gray-700">Email: {selectedCustomer.email}</p>
                     <p className="mt-1 text-sm text-gray-700">Phone: {selectedCustomer.phone || "-"}</p>
                     <p className="mt-1 text-sm text-gray-700">Address: {selectedCustomer.address || "-"}</p>
                     <h4 className="mb-3 mt-6 text-xl font-semibold">Customer Order History</h4>
                     <div className="overflow-x-auto">
-                      <table className="w-full border bg-white">
+                      <table className="brand-table">
                         <thead>
-                          <tr className="bg-gray-200">
-                            <th className="border p-2">Order ID</th>
-                            <th className="border p-2">Product</th>
-                            <th className="border p-2">Quantity</th>
-                            <th className="border p-2">Total Price</th>
-                            <th className="border p-2">Status</th>
-                            <th className="border p-2">Chat Summary</th>
+                          <tr>
+                            <th>Order ID</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Chat Summary</th>
                           </tr>
                         </thead>
                         <tbody>
                           {selectedCustomer.Orders?.length > 0 ? selectedCustomer.Orders.map((order) => (
                             <tr key={order.id}>
-                              <td className="border p-2">{order.id}</td>
-                              <td className="border p-2">
+                              <td>{order.id}</td>
+                              <td>
                                 {order.order_type === "custom" ? (
                                   `Custom Box (${order.box_length} x ${order.box_width} x ${order.box_height})`
                                 ) : (
@@ -1175,10 +1211,10 @@ function AdminDashboard() {
                                   </div>
                                 )}
                               </td>
-                              <td className="border p-2">{order.quantity}</td>
-                              <td className="border p-2">Rs. {order.total_price}</td>
-                              <td className="border p-2">{order.status}</td>
-                              <td className="border p-2">
+                              <td>{order.quantity}</td>
+                              <td>Rs. {order.total_price}</td>
+                              <td>{order.status}</td>
+                              <td>
                                 {order.admin_comment || "-"}
                                 {order.customer_reply && <p className="mt-2 text-sm text-blue-700">Customer reply: {order.customer_reply}</p>}
                                 {order.design_file_data && (
@@ -1203,7 +1239,7 @@ function AdminDashboard() {
                                 )}
                               </td>
                             </tr>
-                          )) : <tr><td className="border p-4 text-center" colSpan="6">No order history for this customer.</td></tr>}
+                          )) : <tr><td className="p-6 text-center text-slate-500" colSpan="6">No order history for this customer.</td></tr>}
                         </tbody>
                       </table>
                     </div>
@@ -1213,17 +1249,17 @@ function AdminDashboard() {
             )}
 
             {activeSection === "products" && (
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-2xl font-bold">Product Management</h2>
+              <div className="brand-panel p-6">
+                <h2 className="brand-title mb-4 !text-2xl">Product Management</h2>
                 <div className="mb-6 grid gap-3 md:grid-cols-[1fr_auto]">
                   <input
-                    className="rounded border p-2"
+                    className="brand-input"
                     placeholder="New product type name (e.g. Rigid Box)"
                     value={newTypeLabel}
                     onChange={(e) => setNewTypeLabel(e.target.value)}
                   />
                   <button
-                    className="rounded bg-indigo-700 px-4 py-2 text-white shadow-sm transition hover:bg-indigo-800"
+                    className="brand-btn-3d brand-btn-blue px-4 py-2"
                     onClick={addProductType}
                   >
                     Add Type
@@ -1231,7 +1267,7 @@ function AdminDashboard() {
                 </div>
                 <div className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   <select
-                    className="rounded border p-2"
+                    className="brand-input"
                     value={productForm.box_type}
                     onChange={(e) => setProductForm({ ...productForm, box_type: e.target.value })}
                   >
@@ -1241,11 +1277,11 @@ function AdminDashboard() {
                       </option>
                     ))}
                   </select>
-                  <input className="rounded border p-2" placeholder="Product Name" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} />
-                  <input className="rounded border p-2" placeholder="Description" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} />
-                  <input className="rounded border p-2" type="file" accept="image/*" onChange={handleProductImageChange} />
-                  <input className="rounded border p-2" placeholder="Price" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} />
-                  <input className="rounded border p-2" placeholder="Stock" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} />
+                  <input className="brand-input" placeholder="Product Name" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} />
+                  <input className="brand-input" placeholder="Description" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} />
+                  <input className="brand-input" type="file" accept="image/*" onChange={handleProductImageChange} />
+                  <input className="brand-input" placeholder="Price" value={productForm.price} onChange={(e) => setProductForm({ ...productForm, price: e.target.value })} />
+                  <input className="brand-input" placeholder="Stock" value={productForm.stock} onChange={(e) => setProductForm({ ...productForm, stock: e.target.value })} />
                 </div>
                 <p className="mb-4 text-xs text-gray-500">
                   Upload product photo in common image formats. Maximum size: 10 MB.
@@ -1255,54 +1291,54 @@ function AdminDashboard() {
                     <img
                       src={productForm.image_data}
                       alt="Product preview"
-                      className="h-24 w-24 rounded border object-cover"
+                      className="brand-image-3d h-24 w-24 rounded-2xl object-cover"
                     />
                   </div>
                 )}
                 <div className="mb-6">
-                  <button className="mr-2 rounded bg-green-600 px-4 py-2 text-white" onClick={saveProduct}>{editingProductId ? "Update Product" : "Add Product"}</button>
-                  <button className="rounded bg-gray-500 px-4 py-2 text-white" onClick={resetForm}>Clear</button>
+                  <button className="brand-btn-3d brand-btn-green mr-2 px-4 py-2" onClick={saveProduct}>{editingProductId ? "Update Product" : "Add Product"}</button>
+                  <button className="brand-btn-3d brand-btn-gray px-4 py-2" onClick={resetForm}>Clear</button>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full border bg-white">
+                  <table className="brand-table">
                     <thead>
-                      <tr className="bg-gray-200">
-                        <th className="border p-2">Photo</th>
-                        <th className="border p-2">Box Type</th>
-                        <th className="border p-2">Name</th>
-                        <th className="border p-2">Description</th>
-                        <th className="border p-2">Price</th>
-                        <th className="border p-2">Stock</th>
-                        <th className="border p-2">Action</th>
+                      <tr>
+                        <th>Photo</th>
+                        <th>Box Type</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {products.length > 0 ? products.map((product) => (
                         <tr key={product.id}>
-                          <td className="border p-2">
+                          <td>
                             {product.image_data ? (
                               <img
                                 src={product.image_data}
                                 alt={product.name}
-                                className="h-14 w-14 rounded object-cover"
+                                className="brand-image-3d h-14 w-14 rounded-xl object-cover"
                               />
                             ) : (
                               "-"
                             )}
                           </td>
-                          <td className="border p-2">
+                          <td>
                             {boxTypeOptions.find((option) => option.value === product.box_type)?.label || "-"}
                           </td>
-                          <td className="border p-2">{product.name}</td>
-                          <td className="border p-2">{product.description || "-"}</td>
-                          <td className="border p-2">Rs. {product.price}</td>
-                          <td className="border p-2">{product.stock}</td>
-                          <td className="border p-2">
-                            <button className="mr-2 rounded bg-blue-600 px-3 py-1 text-white" onClick={() => startEdit(product)}>Edit</button>
-                            <button className="rounded bg-red-600 px-3 py-1 text-white" onClick={() => deleteProduct(product.id)}>Delete</button>
+                          <td>{product.name}</td>
+                          <td>{product.description || "-"}</td>
+                          <td>Rs. {product.price}</td>
+                          <td>{product.stock}</td>
+                          <td>
+                            <button className="brand-btn-3d brand-btn-blue mr-2 px-3 py-1.5" onClick={() => startEdit(product)}>Edit</button>
+                            <button className="brand-btn-3d brand-btn-red px-3 py-1.5" onClick={() => deleteProduct(product.id)}>Delete</button>
                           </td>
                         </tr>
-                      )) : <tr><td className="border p-4 text-center" colSpan="7">No products found.</td></tr>}
+                      )) : <tr><td className="p-6 text-center text-slate-500" colSpan="7">No products found.</td></tr>}
                     </tbody>
                   </table>
                 </div>
@@ -1310,17 +1346,17 @@ function AdminDashboard() {
             )}
 
             {activeSection === "materials" && (
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-2xl font-bold">Material Stock</h2>
+              <div className="brand-panel p-6">
+                <h2 className="brand-title mb-4 !text-2xl">Material Stock</h2>
                 <div className="mb-4 grid gap-3 md:grid-cols-[1fr_auto]">
                   <input
-                    className="rounded border p-2"
+                    className="brand-input"
                     placeholder="Add new material name (e.g. Paper Roll)"
                     value={newMaterialName}
                     onChange={(e) => setNewMaterialName(e.target.value)}
                   />
                   <button
-                    className="rounded bg-indigo-700 px-4 py-2 text-white shadow-sm transition hover:bg-indigo-800"
+                    className="brand-btn-3d brand-btn-blue px-4 py-2"
                     onClick={addNewMaterial}
                   >
                     Add Material
@@ -1328,7 +1364,7 @@ function AdminDashboard() {
                 </div>
                 <div className="mb-4 grid gap-3 md:grid-cols-3">
                   <select
-                    className="rounded border p-2"
+                    className="brand-input"
                     value={editingMaterialId ? String(editingMaterialId) : ""}
                     onChange={handleMaterialSelect}
                   >
@@ -1340,19 +1376,19 @@ function AdminDashboard() {
                     ))}
                   </select>
                   <input
-                    className="rounded border p-2"
+                    className="brand-input"
                     placeholder="Unit (kg)"
                     value={materialForm.unit}
                     onChange={(e) => setMaterialForm({ ...materialForm, unit: e.target.value })}
                   />
                   <input
-                    className="rounded border p-2"
+                    className="brand-input"
                     placeholder="Quantity"
                     value={materialForm.quantity}
                     onChange={(e) => setMaterialForm({ ...materialForm, quantity: e.target.value })}
                   />
                   <input
-                    className="rounded border p-2"
+                    className="brand-input"
                     placeholder="Price per Unit"
                     value={materialForm.unit_price}
                     onChange={(e) =>
@@ -1362,52 +1398,52 @@ function AdminDashboard() {
                 </div>
                 <div className="mb-6">
                   <button
-                    className="mr-2 rounded bg-green-600 px-4 py-2 text-white"
+                    className="brand-btn-3d brand-btn-green mr-2 px-4 py-2"
                     onClick={saveMaterial}
                   >
                     Update Material
                   </button>
                   <button
-                    className="rounded bg-gray-500 px-4 py-2 text-white"
+                    className="brand-btn-3d brand-btn-gray px-4 py-2"
                     onClick={resetMaterialForm}
                   >
                     Clear
                   </button>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full border bg-white">
+                  <table className="brand-table">
                     <thead>
-                      <tr className="bg-gray-200">
-                        <th className="border p-2">Material</th>
-                        <th className="border p-2">Unit</th>
-                        <th className="border p-2">Quantity</th>
-                        <th className="border p-2">Price / Unit</th>
-                        <th className="border p-2">Total Value</th>
-                        <th className="border p-2">Action</th>
+                      <tr>
+                        <th>Material</th>
+                        <th>Unit</th>
+                        <th>Quantity</th>
+                        <th>Price / Unit</th>
+                        <th>Total Value</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {materials.length > 0 ? (
                         materials.map((material) => (
                           <tr key={material.id}>
-                            <td className="border p-2">{material.name}</td>
-                            <td className="border p-2">{material.unit}</td>
-                            <td className="border p-2">{material.quantity}</td>
-                            <td className="border p-2">Rs. {material.unit_price}</td>
-                            <td className="border p-2">
+                            <td>{material.name}</td>
+                            <td>{material.unit}</td>
+                            <td>{material.quantity}</td>
+                            <td>Rs. {material.unit_price}</td>
+                            <td>
                               Rs. {Number(
                                 (Number(material.quantity || 0) * Number(material.unit_price || 0)).toFixed(2)
                               )}
                             </td>
-                            <td className="border p-2">
+                            <td>
                               <button
-                                className="mr-2 rounded bg-blue-600 px-3 py-1 text-white"
+                                className="brand-btn-3d brand-btn-blue mr-2 px-3 py-1.5"
                                 onClick={() => startEditMaterial(material)}
                               >
                                 Edit
                               </button>
                               <button
-                                className="rounded bg-red-600 px-3 py-1 text-white"
+                                className="brand-btn-3d brand-btn-red px-3 py-1.5"
                                 onClick={() => deleteMaterial(material.id)}
                               >
                                 Delete
@@ -1417,7 +1453,7 @@ function AdminDashboard() {
                         ))
                       ) : (
                         <tr>
-                          <td className="border p-4 text-center" colSpan="6">
+                          <td className="p-6 text-center text-slate-500" colSpan="6">
                             No materials found.
                           </td>
                         </tr>
@@ -1429,14 +1465,14 @@ function AdminDashboard() {
             )}
 
             {activeSection === "site-settings" && (
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-2xl font-bold">Site Settings</h2>
+              <div className="brand-panel p-6">
+                <h2 className="brand-title mb-4 !text-2xl">Site Settings</h2>
                 <div className="grid gap-6">
-                  <div className="rounded-2xl border border-slate-200 p-5">
+                  <div className="brand-tile p-5">
                     <h3 className="text-xl font-semibold">Branding</h3>
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Company Name"
                         value={brandingForm.companyName || ""}
                         onChange={(e) =>
@@ -1447,7 +1483,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Kicker"
                         value={brandingForm.kicker || ""}
                         onChange={(e) =>
@@ -1458,7 +1494,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Logo Alt Text"
                         value={brandingForm.logoAlt || ""}
                         onChange={(e) =>
@@ -1469,14 +1505,14 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         type="file"
                         accept="image/*"
                         onChange={handleBrandLogoChange}
                       />
                     </div>
                     <textarea
-                      className="mt-3 w-full rounded border p-2"
+                      className="brand-input mt-3"
                       rows="3"
                       placeholder="Short description"
                       value={brandingForm.description || ""}
@@ -1492,13 +1528,13 @@ function AdminDashboard() {
                         <img
                           src={brandingForm.logoData}
                           alt="Logo preview"
-                          className="h-20 w-auto rounded border bg-white p-2"
+                          className="brand-image-3d h-20 w-auto rounded-2xl bg-white p-2"
                         />
                       </div>
                     )}
                     <div className="mt-4">
                       <button
-                        className="rounded bg-indigo-700 px-4 py-2 text-white shadow-sm transition hover:bg-indigo-800"
+                        className="brand-btn-3d brand-btn-blue px-4 py-2"
                         onClick={saveBrandingSettings}
                       >
                         Save Branding
@@ -1506,11 +1542,11 @@ function AdminDashboard() {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 p-5">
+                  <div className="brand-tile p-5">
                     <h3 className="text-xl font-semibold">Home Page</h3>
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Hero Kicker"
                         value={homeForm.heroKicker}
                         onChange={(e) =>
@@ -1518,7 +1554,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Hero Title"
                         value={homeForm.heroTitle}
                         onChange={(e) =>
@@ -1526,7 +1562,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Primary Button Label"
                         value={homeForm.primaryCtaLabel}
                         onChange={(e) =>
@@ -1537,7 +1573,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Secondary Button Label"
                         value={homeForm.secondaryCtaLabel}
                         onChange={(e) =>
@@ -1549,7 +1585,7 @@ function AdminDashboard() {
                       />
                     </div>
                     <textarea
-                      className="mt-3 w-full rounded border p-2"
+                      className="brand-input mt-3"
                       rows="3"
                       placeholder="Hero Subtitle"
                       value={homeForm.heroSubtitle}
@@ -1559,7 +1595,7 @@ function AdminDashboard() {
                     />
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Featured Title"
                         value={homeForm.featureTitle}
                         onChange={(e) =>
@@ -1567,7 +1603,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Benefits Title"
                         value={homeForm.benefitsTitle}
                         onChange={(e) =>
@@ -1576,7 +1612,7 @@ function AdminDashboard() {
                       />
                     </div>
                     <textarea
-                      className="mt-3 w-full rounded border p-2"
+                      className="brand-input mt-3"
                       rows="2"
                       placeholder="Featured Description"
                       value={homeForm.featureDescription}
@@ -1589,7 +1625,7 @@ function AdminDashboard() {
                     />
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <textarea
-                        className="rounded border p-2"
+                        className="brand-input"
                         rows="4"
                         placeholder="Stats list (Value|Label per line)"
                         value={homeForm.statsText}
@@ -1598,7 +1634,7 @@ function AdminDashboard() {
                         }
                       />
                       <textarea
-                        className="rounded border p-2"
+                        className="brand-input"
                         rows="4"
                         placeholder="Collection list (Title|Description per line)"
                         value={homeForm.collectionText}
@@ -1611,7 +1647,7 @@ function AdminDashboard() {
                       />
                     </div>
                     <textarea
-                      className="mt-3 w-full rounded border p-2"
+                      className="brand-input mt-3"
                       rows="4"
                       placeholder="Benefits points (one per line)"
                       value={homeForm.benefitsText}
@@ -1621,7 +1657,7 @@ function AdminDashboard() {
                     />
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Footer Kicker"
                         value={homeForm.footerKicker}
                         onChange={(e) =>
@@ -1629,7 +1665,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Footer Title"
                         value={homeForm.footerTitle}
                         onChange={(e) =>
@@ -1638,7 +1674,7 @@ function AdminDashboard() {
                       />
                     </div>
                     <textarea
-                      className="mt-3 w-full rounded border p-2"
+                      className="brand-input mt-3"
                       rows="2"
                       placeholder="Footer Subtitle"
                       value={homeForm.footerSubtitle}
@@ -1648,7 +1684,7 @@ function AdminDashboard() {
                     />
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Address Text"
                         value={homeForm.addressText}
                         onChange={(e) =>
@@ -1656,7 +1692,7 @@ function AdminDashboard() {
                         }
                       />
                       <input
-                        className="rounded border p-2"
+                        className="brand-input"
                         placeholder="Address Link"
                         value={homeForm.addressLink}
                         onChange={(e) =>
@@ -1665,7 +1701,7 @@ function AdminDashboard() {
                       />
                     </div>
                     <textarea
-                      className="mt-3 w-full rounded border p-2"
+                      className="brand-input mt-3"
                       rows="4"
                       placeholder="Contacts list (Name|Phone per line)"
                       value={homeForm.contactsText}
@@ -1675,7 +1711,7 @@ function AdminDashboard() {
                     />
                     <div className="mt-4">
                       <button
-                        className="rounded bg-indigo-700 px-4 py-2 text-white shadow-sm transition hover:bg-indigo-800"
+                        className="brand-btn-3d brand-btn-blue px-4 py-2"
                         onClick={saveHomeSettings}
                       >
                         Save Home Page
@@ -1690,15 +1726,15 @@ function AdminDashboard() {
 
         {/* Payment Modal for Admin */}
         {showPaymentModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="w-96 rounded-lg bg-white p-6 shadow-xl">
-              <h2 className="mb-4 text-xl font-bold">Record Payment</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm">
+            <div className="brand-panel brand-reveal w-96 p-6">
+              <h2 className="brand-title mb-4 !text-xl">Record Payment</h2>
               <p className="mb-2 text-sm text-gray-600">Order #{paymentOrderId}</p>
               <div className="mb-4">
                 <label className="mb-1 block text-sm font-semibold">Amount Received (Rs.)</label>
                 <input
                   type="number"
-                  className="w-full rounded border px-3 py-2"
+                  className="brand-input"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
                 />
@@ -1706,7 +1742,7 @@ function AdminDashboard() {
               <div className="mb-4">
                 <label className="mb-1 block text-sm font-semibold">Method</label>
                 <select
-                  className="w-full rounded border px-3 py-2"
+                  className="brand-input"
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 >
@@ -1717,13 +1753,13 @@ function AdminDashboard() {
               </div>
               <div className="flex justify-end gap-3">
                 <button
-                  className="rounded bg-gray-500 px-4 py-2 text-white"
+                  className="brand-btn-3d brand-btn-gray px-4 py-2"
                   onClick={() => setShowPaymentModal(false)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="rounded bg-green-600 px-4 py-2 text-white"
+                  className="brand-btn-3d brand-btn-green px-4 py-2"
                   onClick={handleRecordPayment}
                 >
                   Record

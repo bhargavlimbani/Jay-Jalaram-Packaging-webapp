@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { getProfile } from "../services/authService";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import Tilt3D from "../components/Tilt3D";
 
 function CustomerDashboard() {
   const { user, updateUser } = useContext(AuthContext);
@@ -260,8 +261,8 @@ function CustomerDashboard() {
 
   const renderChatPanel = (orderId) =>
     openChatOrderId === orderId ? (
-      <div className="mt-3 rounded border bg-slate-50 p-3">
-        <div className="max-h-48 overflow-y-auto rounded border bg-white p-3">
+      <div className="brand-note mt-3 bg-slate-50/80 p-3">
+        <div className="brand-input max-h-48 overflow-y-auto !py-3">
           {(chatMessages[orderId] || []).length > 0 ? (
             chatMessages[orderId].map((chat, index) => (
               <div key={`${orderId}-${index}`} className="mb-3">
@@ -274,7 +275,7 @@ function CustomerDashboard() {
           )}
         </div>
         <textarea
-          className="mt-3 w-full rounded border p-2 text-sm"
+          className="brand-input mt-3 text-sm"
           rows="2"
           placeholder="Type message to admin"
           value={chatInputs[orderId] || ""}
@@ -283,7 +284,7 @@ function CustomerDashboard() {
           }
         />
         <button
-          className="mt-2 rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700"
+          className="mt-2 brand-btn-3d brand-btn-blue px-3 py-1.5"
           onClick={() => sendChatMessage(orderId)}
         >
           Send Chat
@@ -292,40 +293,41 @@ function CustomerDashboard() {
     ) : null;
 
   return (
-    <div>
+    <div className="brand-page">
       <Navbar />
-      <div className="p-10">
+      <div className="brand-container py-8 lg:py-12">
 
-        <div className="mb-6 rounded border border-blue-200 bg-blue-50 px-4 py-4">
-          <h2 className="text-xl font-semibold">Welcome, {user?.name || "Customer"}</h2>
-          <p className="mt-1 text-sm text-gray-700">
+        <div className="brand-panel brand-reveal mb-6 px-6 py-7 md:px-8">
+          <p className="brand-kicker">Customer Dashboard</p>
+          <h2 className="brand-title mt-2 !text-3xl">Welcome, {user?.name || "Customer"}</h2>
+          <p className="mt-3 text-sm text-slate-600">
             Email: {user?.email || "-"} | Phone: {user?.phone || "-"}
           </p>
         </div>
-        {message && <div className="mb-6 rounded bg-blue-100 px-4 py-3 text-blue-900">{message}</div>}
-        <div className="mb-8 rounded-xl border border-green-200 bg-green-50 p-5">
+        {message && <div className="brand-note brand-note-blue mb-6">{message}</div>}
+        <div className="brand-panel brand-reveal brand-reveal-2 mb-8 border-green-200/60 bg-gradient-to-b from-[#f2fbf5]/95 to-[#e6f7ec]/85 p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-green-900">Selected Products</h2>
+              <h2 className="text-2xl font-black tracking-tight text-green-900">Selected Products</h2>
               <p className="mt-1 text-sm text-green-800">
                 Add multiple products, review your order, then confirm once to place it.
               </p>
             </div>
-            <div className="rounded-lg bg-white px-4 py-3 text-sm shadow-sm">
+            <div className="brand-tile px-4 py-3 text-sm">
               <p>Total Items: {cartQuantity}</p>
               <p className="mt-1 font-semibold">Estimated Total: Rs. {cartTotal.toFixed(2)}</p>
             </div>
           </div>
           {cartItems.length > 0 ? (
             <div className="mt-4 overflow-x-auto">
-              <table className="w-full rounded-lg bg-white">
+              <table className="brand-table">
                 <thead>
-                  <tr className="bg-green-100 text-left">
-                    <th className="p-3">Product</th>
-                    <th className="p-3">Price</th>
-                    <th className="p-3">Quantity</th>
-                    <th className="p-3">Subtotal</th>
-                    <th className="p-3">Action</th>
+                  <tr className="text-left">
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -337,7 +339,7 @@ function CustomerDashboard() {
                         <input
                           type="number"
                           min="1"
-                          className="w-24 rounded border px-3 py-2"
+                          className="brand-input w-24 !px-3 !py-2"
                           value={item.quantity}
                           onChange={(e) => updateCartQuantity(item.product_id, e.target.value)}
                         />
@@ -345,7 +347,7 @@ function CustomerDashboard() {
                       <td className="p-3">Rs. {Number(item.total_price).toFixed(2)}</td>
                       <td className="p-3">
                         <button
-                          className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
+                          className="brand-btn-3d brand-btn-red px-3 py-1.5"
                           onClick={() => removeFromCart(item.product_id)}
                         >
                           Remove
@@ -357,14 +359,14 @@ function CustomerDashboard() {
               </table>
               <div className="mt-4 flex flex-wrap gap-3">
                 <button
-                  className="rounded bg-green-600 px-5 py-3 text-white hover:bg-green-700 disabled:opacity-60"
+                  className="brand-btn-3d brand-btn-green px-5 py-3"
                   onClick={placeCartOrder}
                   disabled={placingCartOrder}
                 >
                   {placingCartOrder ? "Placing Order..." : "Confirm And Place Order"}
                 </button>
                 <button
-                  className="rounded bg-gray-500 px-5 py-3 text-white hover:bg-gray-600"
+                  className="brand-btn-3d brand-btn-gray px-5 py-3"
                   onClick={() => setCartItems([])}
                 >
                   Clear Selection
@@ -377,25 +379,25 @@ function CustomerDashboard() {
             </p>
           )}
         </div>
-        <h2 className="mb-4 text-2xl font-bold">All Products</h2>
+        <h2 className="brand-title mb-4 !text-3xl">All Products</h2>
         <div className="mb-6">
           <Link to="/order">
-            <button className="rounded bg-green-600 px-5 py-3 text-white hover:bg-green-700">
+            <button className="brand-btn-3d brand-btn-green px-5 py-3">
               Custom Box Order
             </button>
           </Link>
           <Link to="/invoices" className="ml-3">
-            <button className="rounded bg-[var(--brand-ink)] px-5 py-3 text-white hover:bg-black">
+            <button className="brand-button-dark px-5 py-3">
               View Invoices
             </button>
           </Link>
         </div>
-        <div className="mb-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="brand-scene mb-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product) => {
             const isCustomProduct =
               product.name === "Custom Size Box" || product.name === "Custom Design Box";
             return (
-              <div key={product.id} className="rounded-xl border bg-white p-5 shadow-sm">
+              <Tilt3D key={product.id} max={8} lift={10} className="brand-tile h-full p-5">
                 <img
                   src={product.image_url
                     ? product.image_url
@@ -403,19 +405,19 @@ function CustomerDashboard() {
                     ? product.image_data
                   : "https://via.placeholder.com/300"}
                   alt={product.name}
-                  className="mb-4 h-40 w-full rounded bg-gray-100 object-contain p-2"
+                  className="brand-image-3d mb-4 h-40 w-full rounded-2xl bg-white/70 object-contain p-2"
                 />
-                <h3 className="text-xl font-semibold">{product.name}</h3>
+                <h3 className="brand-layer-1 text-xl font-black tracking-tight">{product.name}</h3>
                 <p className="mt-2 text-sm text-gray-600">{product.description || "Standard packaging product"}</p>
                 {product.name === "Custom Size Box" && <p className="mt-2 text-sm text-blue-700">Use the custom box order form for custom size requirement.</p>}
                 {product.name === "Custom Design Box" && <p className="mt-2 text-sm text-blue-700">Use the custom box order form for custom design requirement.</p>}
-                <p className="mt-3 font-semibold text-green-700">Price: Rs. {product.price}</p>
+                <p className="mt-3 text-lg font-black tracking-tight text-green-700">Rs. {product.price}</p>
                 <p className="mt-1 text-sm text-gray-700">Stock: {product.stock}</p>
                 <div className="mt-4 flex gap-3">
                   <input
                     type="number"
                     min="1"
-                    className="w-24 rounded border px-3 py-2"
+                    className="brand-input w-24 !px-3 !py-2"
                     value={quantities[product.id] || 1}
                     onChange={(e) =>
                       setQuantities((prev) => ({ ...prev, [product.id]: e.target.value }))
@@ -424,13 +426,13 @@ function CustomerDashboard() {
                   />
                   {isCustomProduct ? (
                     <Link to="/order" className="flex-1">
-                      <button className="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                      <button className="brand-btn-3d brand-btn-blue w-full px-4 py-2">
                         Custom Box Order
                       </button>
                     </Link>
                   ) : (
                     <button
-                      className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+                      className="brand-btn-3d brand-btn-blue px-4 py-2"
                       onClick={() => addToCart(product)}
                       disabled={Number(product.stock) <= 0}
                     >
@@ -438,32 +440,32 @@ function CustomerDashboard() {
                     </button>
                   )}
                 </div>
-              </div>
+              </Tilt3D>
             );
           })}
         </div>
-        <h2 className="mb-4 text-2xl font-bold">My Order History</h2>
-        <table className="w-full border bg-white">
+        <h2 className="brand-title mb-4 !text-3xl">My Order History</h2>
+        <table className="brand-table">
           <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">Order ID</th>
-              <th className="border p-2">Date & Time</th>
-              <th className="border p-2">Product</th>
-              <th className="border p-2">Quantity</th>
-              <th className="border p-2">Total Price</th>
-              <th className="border p-2">Approval Status</th>
-              <th className="border p-2">Payment Status</th>
-              <th className="border p-2">Chat</th>
-              <th className="border p-2">Action</th>
+            <tr>
+              <th>Order ID</th>
+              <th>Date & Time</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Total Price</th>
+              <th>Approval Status</th>
+              <th>Payment Status</th>
+              <th>Chat</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {Array.isArray(orders) && orders.length > 0 ? (
               orders.map((order) => (
                 <tr key={order.id}>
-                  <td className="border p-2 align-top">{order.id}</td>
-                  <td className="border p-2 align-top">{formatOrderDateTime(order.createdAt)}</td>
-                  <td className="border p-2 align-top">
+                  <td>{order.id}</td>
+                  <td>{formatOrderDateTime(order.createdAt)}</td>
+                  <td>
                     {order.order_type === "custom" ? (
                       `Custom Box (${order.box_length} x ${order.box_width} x ${order.box_height})`
                     ) : (
@@ -476,23 +478,23 @@ function CustomerDashboard() {
                       </div>
                     )}
                   </td>
-                  <td className="border p-2 align-top">{order.quantity}</td>
-                  <td className="border p-2 align-top">Rs. {order.total_price}</td>
-                  <td className="border p-2 align-top">{order.status}</td>
-                  <td className="border p-2 align-top font-semibold text-blue-700">{order.payment_status || "Unpaid"}</td>
-                  <td className="border p-2 align-top">
+                  <td>{order.quantity}</td>
+                  <td>Rs. {order.total_price}</td>
+                  <td>{order.status}</td>
+                  <td className="font-semibold text-blue-700">{order.payment_status || "Unpaid"}</td>
+                  <td>
                     {renderChatPanel(order.id)}
                   </td>
-                  <td className="border p-2 align-top">
+                  <td>
                     <button
-                      className="mb-2 w-full rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700"
+                      className="brand-btn-3d brand-btn-blue mb-2 w-full px-3 py-1.5"
                       onClick={() => fetchOrderChat(order.id)}
                     >
                       Chat
                     </button>
                     {(order.payment_status !== "Paid" && order.status === "Completed") && (
                       <button
-                        className="mb-2 w-full rounded bg-green-600 px-3 py-1 text-white hover:bg-green-700"
+                        className="brand-btn-3d brand-btn-green mb-2 w-full px-3 py-1.5"
                         onClick={() => {
                           setPaymentOrderId(order.id);
                           setPaymentOrderTotal(order.total_price);
@@ -505,7 +507,7 @@ function CustomerDashboard() {
                     )}
                     {order.status === "Pending" ? (
                       <button
-                        className="w-full rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
+                        className="w-full brand-btn-3d brand-btn-red px-3 py-1.5"
                         onClick={() => cancelOrder(order.id)}
                       >
                         Cancel
@@ -518,7 +520,7 @@ function CustomerDashboard() {
               ))
             ) : (
               <tr>
-                <td className="border p-4 text-center" colSpan="8">No orders found yet.</td>
+                <td className="p-8 text-center text-slate-500" colSpan="8">No orders found yet.</td>
               </tr>
             )}
           </tbody>
@@ -536,7 +538,7 @@ function CustomerDashboard() {
               {!showQrCode ? (
                 <div className="flex flex-col gap-3">
                   <button
-                    className="rounded bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"
+                    className="brand-btn-3d brand-btn-green px-4 py-3"
                     onClick={() => setShowQrCode(true)}
                   >
                     Pay Online (UPI QR)
@@ -565,10 +567,10 @@ function CustomerDashboard() {
                   <img 
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(`upi://pay?pa=limbanibhargavmaheshbhai-1@okhdfcbank&pn=Jay%20Jalaram%20Packaging&am=${(paymentOrderTotal * 1.18).toFixed(2)}&cu=INR`)}`} 
                     alt="UPI QR Code" 
-                    className="mb-4 h-56 w-56 rounded border p-2 shadow-sm"
+                    className="brand-tile mb-4 h-56 w-56 p-2"
                   />
                   <button
-                    className="mt-2 w-full rounded bg-blue-600 px-4 py-2 text-white font-semibold shadow hover:bg-blue-700"
+                    className="brand-btn-3d brand-btn-blue mt-2 w-full px-4 py-2"
                     onClick={async () => {
                       try {
                         await api.post("/payments/self-report", {
