@@ -186,7 +186,7 @@ Proprietary — All rights reserved to Jay Jalaram Packaging
 ---
 
 ## 📞 Support
-- Email: workpriyakhakhkhar@gmail.com
+- Email: limbanibhargavmaheshbhai@gmail.com
 - GitHub Issues: [Open an issue](https://github.com/bhargavlimbani/Jay-Jalaram-Packaging-webapp/issues)
 
 ---
